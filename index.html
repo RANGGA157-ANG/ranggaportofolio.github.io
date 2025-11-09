@@ -532,9 +532,42 @@
 
 
 
-    <!-- SOCIAL / CONTACT -->
+    <!-- CONTACT FORM -->
     <section id="Contact" class="contact container">
-      <h2>Kontak & Media Sosial</h2>
+      <h2>Hubungi Saya</h2>
+      <p style="color:var(--muted);margin-bottom:2rem">Kirim saran, pesan, atau pesan untuk pemesanan jasa desain. Pesan akan langsung dikirim ke WhatsApp saya.</p>
+
+      <form id="contactForm" style="max-width:600px;margin:0 auto;background:linear-gradient(180deg,var(--panel),#07101a);padding:2rem;border-radius:12px;border:1px solid rgba(255,255,255,0.02);box-shadow:0 8px 30px rgba(0,0,0,0.6)">
+        <div style="margin-bottom:1rem">
+          <label for="contactName" style="display:block;color:var(--muted);font-weight:700;margin-bottom:0.5rem">Nama</label>
+          <input type="text" id="contactName" required style="width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;font-family:inherit">
+        </div>
+
+        <div style="margin-bottom:1rem">
+          <label for="contactEmail" style="display:block;color:var(--muted);font-weight:700;margin-bottom:0.5rem">Email (Opsional)</label>
+          <input type="email" id="contactEmail" style="width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;font-family:inherit">
+        </div>
+
+        <div style="margin-bottom:1rem">
+          <label for="contactType" style="display:block;color:var(--muted);font-weight:700;margin-bottom:0.5rem">Jenis Pesan</label>
+          <select id="contactType" required style="width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;font-family:inherit">
+            <option value="" style="background:var(--panel);color:#eaf3fb">-- Pilih Jenis Pesan --</option>
+            <option value="saran" style="background:var(--panel);color:#eaf3fb">Saran</option>
+            <option value="pemesanan" style="background:var(--panel);color:#eaf3fb">Pemesanan Jasa</option>
+            <option value="kolaborasi" style="background:var(--panel);color:#eaf3fb">Kolaborasi</option>
+            <option value="lainnya" style="background:var(--panel);color:#eaf3fb">Lainnya</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom:1.5rem">
+          <label for="contactMessage" style="display:block;color:var(--muted);font-weight:700;margin-bottom:0.5rem">Pesan</label>
+          <textarea id="contactMessage" required rows="5" style="width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;font-family:inherit;resize:vertical" placeholder="Tulis pesan Anda di sini..."></textarea>
+        </div>
+
+        <button type="submit" class="btn" style="width:100%;padding:14px;font-size:1rem">Kirim ke WhatsApp</button>
+      </form>
+
+      <h2 style="margin-top:3rem">Media Sosial</h2>
       <div style="margin-top:10px" class="contact-grid">
         <a href="https://www.instagram.com/bang._angga" target="_blank" aria-label="Instagram Rangga"><i class="fab fa-instagram"></i></a>
         <a href="https://www.tiktok.com/@bang._ang6" target="_blank" aria-label="TikTok Rangga"><i class="fab fa-tiktok"></i></a>
@@ -748,6 +781,37 @@
 
     /* ---------- Utilities & init ---------- */
     document.getElementById('toTop').addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
+
+    // Contact Form Handler
+    document.getElementById('contactForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('contactName').value.trim();
+      const email = document.getElementById('contactEmail').value.trim();
+      const type = document.getElementById('contactType').value;
+      const message = document.getElementById('contactMessage').value.trim();
+
+      if (!name || !type || !message) {
+        alert('Mohon lengkapi semua field yang wajib diisi.');
+        return;
+      }
+
+      // Construct WhatsApp message
+      let waMessage = `*Pesan dari Portofolio Rangga*\n\n`;
+      waMessage += `*Nama:* ${name}\n`;
+      if (email) waMessage += `*Email:* ${email}\n`;
+      waMessage += `*Jenis Pesan:* ${type}\n\n`;
+      waMessage += `*Pesan:*\n${message}`;
+
+      // Encode for URL
+      const encodedMessage = encodeURIComponent(waMessage);
+      const waUrl = `https://wa.me/6287860087460?text=${encodedMessage}`;
+
+      // Open WhatsApp
+      window.open(waUrl, '_blank');
+
+      // Reset form
+      document.getElementById('contactForm').reset();
+    });
 
     // initial set progress-bar width from data-value for static values
     document.addEventListener('DOMContentLoaded', ()=> {
