@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Blender 3D — Detail Project</title>
+  <style>
+    :root{--accent:#ff9800;--muted:#9aa4b2}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter, system-ui, Arial;background:#071018;color:#eaf0f6}
+    .topbar{background:linear-gradient(180deg,#07101b,#041018);padding:12px 16px;position:sticky;top:0;border-bottom:1px solid rgba(255,255,255,0.03)}
+    .topbar a{color:var(--muted);text-decoration:none;font-weight:600}
+    .container{max-width:1000px;margin:28px auto;padding:0 16px}
+    h1{color:var(--accent);margin:0 0 8px}
+    .meta{color:var(--muted);margin-bottom:18px}
+    .slider{position:relative;border-radius:10px;overflow:hidden;background:#08121a}
+    .slides{display:flex;transition:transform .45s ease}
+    .slides img{width:100%;height:520px;object-fit:cover;flex-shrink:0}
+    .nav-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:#fff;padding:10px 12px;border-radius:8px;cursor:pointer}
+    .nav-btn.prev{left:12px} .nav-btn.next{right:12px}
+    .thumbs{display:flex;gap:8px;margin-top:12px;overflow-x:auto;padding-bottom:8px}
+    .thumbs img{width:120px;height:70px;object-fit:cover;border-radius:6px;cursor:pointer;opacity:0.8;border:2px solid transparent}
+    .thumbs img.active{opacity:1;border-color:var(--accent)}
+    .content{display:flex;gap:24px;margin-top:20px;flex-wrap:wrap}
+    .desc{flex:1;min-width:280px}
+    .info{width:300px;min-width:220px;background:linear-gradient(180deg,#081218,#051018);padding:12px;border-radius:8px}
+    .back{display:inline-block;margin-top:16px;padding:10px 14px;border-radius:8px;background:var(--accent);color:#071018;text-decoration:none;font-weight:700}
+    @media(max-width:700px){ .slides img{height:320px} .thumbs img{width:90px;height:60px} .info{width:100%} .content{flex-direction:column} }
+  </style>
+</head>
+<body>
+  <div class="topbar"><a href="portfolio_enhanced.html">&#8592; Kembali ke Portofolio</a></div>
+  <main class="container">
+    <h1>Blender 3D — Character & Environment</h1>
+    <div class="meta">Tools: Blender • Substance Painter • ZBrush • Durasi: 2 minggu</div>
+
+    <div class="slider" id="slider">
+      <div class="slides" id="slides">
+        <img src="../assets/img/blender1.jpg" alt="Blender image 1">
+        <img src="../assets/img/blender2.jpg" alt="Blender image 2">
+        <img src="../assets/img/blender3.jpg" alt="Blender image 3">
+      </div>
+      <button class="nav-btn prev" id="prev">&#10094;</button>
+      <button class="nav-btn next" id="next">&#10095;</button>
+    </div>
+
+    <div class="thumbs" id="thumbs">
+      <img src="../assets/img/blender1.jpg" data-index="0" class="active">
+      <img src="../assets/img/blender2.jpg" data-index="1">
+      <img src="../assets/img/blender3.jpg" data-index="2">
+    </div>
+
+    <div class="content">
+      <div class="desc">
+        <h2>Deskripsi Project</h2>
+        <p>Project ini adalah kombinasi environment sci-fi dan character stylized. Saya fokus pada blokout, sculpting, retopology, UV, texturing PBR, dan final render.</p>
+        <p>Langkah kerja: concept → blockout → sculpt → retopo → unwrap → texture → lighting → render.</p>
+        <a class="back" href="portfolio_enhanced.html">Kembali ke Portofolio</a>
+      </div>
+      <aside class="info">
+        <h3 style="margin:0 0 8px">Detail Cepat</h3>
+        <p style="margin:6px 0;color:var(--muted)"><strong>Software:</strong> Blender, Substance Painter, ZBrush</p>
+        <p style="margin:6px 0;color:var(--muted)"><strong>Peran:</strong> 3D Artist (modeling, texturing, lighting)</p>
+        <p style="margin:6px 0;color:var(--muted)"><strong>Status:</strong> Selesai</p>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    // Simple slider logic
+    const slidesEl = document.getElementById('slides');
+    const thumbs = document.querySelectorAll('#thumbs img');
+    const total = slidesEl.children.length;
+    let index = 0;
+    function update(){
+      slidesEl.style.transform = 'translateX(' + (-index * 100) + '%)';
+      thumbs.forEach(t=>t.classList.remove('active'));
+      thumbs[index].classList.add('active');
+    }
+    document.getElementById('next').addEventListener('click', ()=>{ index = (index+1) % total; update(); });
+    document.getElementById('prev').addEventListener('click', ()=>{ index = (index-1 + total) % total; update(); });
+    thumbs.forEach(t=>t.addEventListener('click', (e)=>{ index = Number(e.currentTarget.getAttribute('data-index')); update(); }));
+    // keyboard control
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'ArrowRight') document.getElementById('next').click(); if(e.key === 'ArrowLeft') document.getElementById('prev').click(); });
+
+    (function(){
+      // sesuaikan nama app sesuai value di upload.html dropdown
+      const APP_KEY = 'zbrush'; // <-- ganti 'blender' pada blender.html, 'zbrush' pada zbrush.html, dsb.
+
+      function getUploads(){ try{ return JSON.parse(localStorage.getItem('portfolio_uploads') || '[]') }catch(e){return []} }
+      function saveUploads(arr){ localStorage.setItem('portfolio_uploads', JSON.stringify(arr)) }
+      function getSkillSummary(){ try{ return JSON.parse(localStorage.getItem('skill_summary') || '{}') }catch(e){return {}} }
+      function saveSkillSummary(obj){ localStorage.setItem('skill_summary', JSON.stringify(obj)) }
+
+      const thumbsContainer = document.getElementById('thumbs');
+      const summary = getSkillSummary();
+      const appSummary = summary[APP_KEY];
+
+      // Update skill badge/summary di halaman jika ada elemen dengan id #skillSummary
+      const skillBadge = document.getElementById('skillSummary'); // optional DOM element to show average
+      if(skillBadge && appSummary){
+        skillBadge.textContent = APP_KEY + ' Skill: ' + appSummary.average + '% (' + appSummary.count + ' proyek)';
+      }
+
+      // render each upload that matches APP_KEY
+      const uploads = getUploads();
+      const myUploads = uploads.filter(u=>u.app === APP_KEY);
+
+      // append uploaded to slides and thumbs
+      myUploads.forEach((u, idx)=>{
+        // add to slides
+        const slideImg = document.createElement('img');
+        slideImg.src = u.imageData;
+        slideImg.alt = u.description || 'Uploaded work';
+        slidesEl.appendChild(slideImg);
+
+        // add to thumbs
+        const thumbImg = document.createElement('img');
+        thumbImg.src = u.imageData;
+        thumbImg.setAttribute('data-index', slidesEl.children.length - 1);
+        thumbImg.style.position = 'relative';
+        thumbsContainer.appendChild(thumbImg);
+
+        // add delete button on thumb
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '×';
+        deleteBtn.style.position = 'absolute';
+        deleteBtn.style.top = '-5px';
+        deleteBtn.style.right = '-5px';
+        deleteBtn.style.background = '#f44336';
+        deleteBtn.style.color = '#fff';
+        deleteBtn.style.border = 'none';
+        deleteBtn.style.borderRadius = '50%';
+        deleteBtn.style.width = '20px';
+        deleteBtn.style.height = '20px';
+        deleteBtn.style.fontSize = '12px';
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.zIndex = '10';
+        deleteBtn.title = 'Hapus karya ini';
+        thumbImg.appendChild(deleteBtn);
+
+        deleteBtn.addEventListener('click', (e)=>{
+          e.stopPropagation(); // prevent thumb click
+          // remove from localStorage
+          const allUploads = getUploads();
+          const newUploads = allUploads.filter(up => up.id !== u.id);
+          saveUploads(newUploads);
+
+          // update skill summary
+          const sum = getSkillSummary();
+          const cur = sum[APP_KEY];
+          if(cur){
+            const newCount = cur.count - 1;
+            if(newCount > 0){
+              const newAvg = ((cur.average * cur.count) - u.totalPercent) / newCount;
+              sum[APP_KEY] = {average: Number(newAvg.toFixed(2)), count: newCount};
+            } else {
+              delete sum[APP_KEY];
+            }
+            saveSkillSummary(sum);
+          }
+
+          // remove from DOM
+          slidesEl.removeChild(slideImg);
+          thumbsContainer.removeChild(thumbImg);
+
+          // update indices for remaining thumbs
+          const allThumbs = thumbsContainer.querySelectorAll('img');
+          allThumbs.forEach((t, i) => t.setAttribute('data-index', i));
+
+          // update total and index
+          total = slidesEl.children.length;
+          if(index >= total) index = Math.max(0, total - 1);
+          update();
+
+          // update skill badge if exists
+          if(skillBadge && sum[APP_KEY]){
+            skillBadge.textContent = APP_KEY + ' Skill: ' + sum[APP_KEY].average + '% (' + sum[APP_KEY].count + ' proyek)';
+          } else if(skillBadge){
+            skillBadge.textContent = '';
+          }
+        });
+      });
+
+      // update thumbs event listeners after adding
+      const thumbs = thumbsContainer.querySelectorAll('img');
+      thumbs.forEach(t=>t.addEventListener('click', (e)=>{
+        if(!e.target.closest('button')){ // avoid if delete clicked
+          index = Number(e.currentTarget.getAttribute('data-index'));
+          update();
+        }
+      }));
+    })();
+  </script>
+</body>
+</html>
