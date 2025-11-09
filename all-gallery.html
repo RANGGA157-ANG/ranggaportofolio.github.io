@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Galeri Lengkap Portofolio Rangga Abi Yasha - Semua Karya 3D, Desain Grafis, dan Fotografi">
+  <title>Galeri Lengkap — Rangga Abi Yasha</title>
+
+  <!-- Font: Space Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg-dark:#0b0f14;
+      --panel:#0f1728;
+      --muted:#9aa4b2;
+      --accent:#ff9800; /* oranye */
+      --glass: rgba(255,255,255,0.03);
+      --accent-glow: 0 10px 30px rgba(255,152,0,0.08);
+      --maxw:1200px;
+      --mono: 'Space Mono', monospace;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:var(--mono), monospace;background:linear-gradient(180deg,#080b10 0%, #05070a 100%);color:#eaf3fb;-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+
+    /* Header */
+    header{
+      position:sticky;top:0;z-index:60;
+      backdrop-filter: blur(6px);
+      background: linear-gradient(180deg, rgba(15,17,32,0.8), rgba(15,17,32,0.45));
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+    }
+    nav{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1rem}
+    nav h1{font-size:1rem;color:var(--accent);margin:0}
+    .nav-right{display:flex;align-items:center;gap:1rem}
+    .nav-links{display:flex;gap:14px;align-items:center}
+    .nav-links a{padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--muted);font-weight:700;font-size:0.95rem}
+    .nav-links a.active, .nav-links a:hover{background:var(--glass);color:var(--accent)}
+    .nav-links.active{display:flex !important;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:linear-gradient(180deg,var(--panel),#0f1728);border-top:1px solid rgba(255,255,255,0.03);padding:1rem;border-radius:0 0 12px 12px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle{display:none;flex-direction:column;cursor:pointer;padding:8px;border-radius:6px;background:var(--glass)}
+    .mobile-menu-toggle span{width:20px;height:2px;background:var(--muted);margin:3px 0;transition:0.3s}
+    .mobile-menu-toggle.active span:nth-child(1){transform:rotate(-45deg) translate(-5px,5px)}
+    .mobile-menu-toggle.active span:nth-child(2){opacity:0}
+    .mobile-menu-toggle.active span:nth-child(3){transform:rotate(45deg) translate(-5px,-5px)}
+
+    /* container */
+    .container{max-width:var(--maxw);margin:0 auto;padding:0 1rem}
+
+    /* Portfolio */
+    .portfolio{padding:3rem 2rem}
+    .portfolio-grid{max-width:var(--maxw);margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem;padding:0 1rem}
+    .portfolio .card{background:linear-gradient(180deg,#071427,#05101b);padding:0;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.02);transition:transform .3s ease, box-shadow .3s ease}
+    .portfolio .card:hover{transform:translateY(-8px);box-shadow:0 20px 50px rgba(0,0,0,0.8), 0 0 25px rgba(255,152,0,0.1)}
+    .portfolio img{width:100%;height:220px;object-fit:cover;display:block;transition:transform .3s ease}
+    .portfolio .card:hover img{transform:scale(1.05)}
+    .portfolio .card h3{padding:1rem 1rem 0;margin:0}
+    .portfolio .card p{padding:0 1rem 1rem;margin:0;color:var(--muted)}
+
+    /* modal analyzer */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity .3s ease, transform .3s ease;transform:scale(0.9);z-index:9999}
+    .modal.open{opacity:1;pointer-events:auto;transform:scale(1)}
+    .modal .inner{max-width:1000px;width:100%;background:#081018;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);box-shadow:0 20px 60px rgba(0,0,0,0.8), 0 0 20px rgba(255,152,0,0.1)}
+    .modal img{width:100%;height:auto;border-radius:8px}
+    .modal .meta{padding:8px 6px;color:var(--muted)}
+    .modal .delete-btn{background:var(--accent);color:#081019;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:700;margin-top:10px;transition:transform .2s ease, box-shadow .2s ease}
+    .modal .delete-btn:hover{background:#e68a00;transform:translateY(-2px);box-shadow:0 10px 25px rgba(255,152,0,0.3)}
+
+    /* modal for delete confirmation */
+    .modal-delete{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity .3s ease, transform .3s ease;transform:scale(0.9);z-index:10000}
+    .modal-delete.open{opacity:1;pointer-events:auto;transform:scale(1)}
+    .modal-delete .inner{max-width:400px;width:100%;background:#081018;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);box-shadow:0 20px 60px rgba(0,0,0,0.8), 0 0 20px rgba(255,152,0,0.1);text-align:center;position:relative;}
+    .modal-delete .inner button.close{position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;transition:color 0.2s;}
+    .modal-delete .inner button.close:hover{color:#fff}
+    .modal-delete h3{color:#fff;margin-bottom:1rem;}
+    .modal-delete p{color:var(--muted);margin-bottom:1rem;}
+    .modal-delete input[type=password]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;margin-bottom:1rem;transition:border-color 0.3s;}
+    .modal-delete .error{color:#ff6b6b;margin-bottom:1rem;display:none;animation:fadeIn 0.5s;}
+    .modal-delete .success{color:#4caf50;margin-bottom:1rem;display:none;animation:fadeIn 0.5s;}
+    .modal-delete .buttons{display:flex;gap:10px;justify-content:center;}
+    .modal-delete .buttons button{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;cursor:pointer;transition:background 0.2s;}
+    .modal-delete .buttons button.confirm{background:var(--accent);color:#081019;border:none;}
+    .modal-delete .buttons button.confirm:hover{background:#e68a00;}
+
+    /* lightbox for gallery */
+    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s}
+    .lightbox.open{opacity:1;pointer-events:auto}
+    .lightbox img{max-width:90%;max-height:90%;object-fit:contain}
+    .lightbox .close{position:absolute;top:20px;right:20px;color:#fff;font-size:30px;cursor:pointer}
+
+    /* utility */
+    .to-top{position:fixed;right:18px;bottom:18px;width:48px;height:48px;border-radius:10px;background:linear-gradient(180deg,#0b1318,#071018);display:flex;align-items:center;justify-content:center;color:var(--muted);border:1px solid rgba(255,255,255,0.03);cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,0.6);transition:transform .3s ease, box-shadow .3s ease}
+    .to-top:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 12px 35px rgba(0,0,0,0.8), 0 0 15px rgba(255,152,0,0.2)}
+
+    @media (max-width:700px){
+      .nav-links{display:none}
+      .mobile-menu-toggle{display:flex}
+      .portfolio-grid{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+    }
+    @media (max-width:480px){
+      .portfolio-grid{grid-template-columns:1fr}
+      .to-top{right:12px;bottom:12px;width:44px;height:44px}
+    }
+
+    .shake {
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav>
+      <h1><a href="index.html">Rangga Abi Yasha — 3D Artist</a></h1>
+      <div class="nav-right">
+        <div class="nav-links" id="navLinks">
+          <a href="index.html#Home">Home</a>
+          <a href="index.html#About">About</a>
+          <a href="index.html#SkillAplikasi">Skills</a>
+          <a href="index.html#Portofoliodigital">Portfolio</a>
+          <a href="index.html#GalleryArt">Gallery</a>
+          <a href="upload.html">Upload</a>
+          <a href="index.html#Contact">Contact</a>
+        </div>
+        <div class="mobile-menu-toggle" id="mobileMenuToggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- GALLERY -->
+    <section class="portfolio container">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem">
+        <h2>Galeri Lengkap Semua Karya</h2>
+        <div style="color:var(--muted)">Koleksi lengkap semua karya yang telah di-upload</div>
+      </div>
+
+      <!-- Search and Filter -->
+      <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
+        <input type="text" id="searchInput" placeholder="Cari berdasarkan deskripsi..." style="flex:1;min-width:200px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;">
+        <select id="filterSelect" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;">
+          <option value="">Semua Aplikasi</option>
+          <option value="blender">Blender</option>
+          <option value="zbrush">ZBrush</option>
+          <option value="substance">Substance Painter</option>
+          <option value="photoshop">Photoshop</option>
+          <option value="illustrator">Illustrator</option>
+          <option value="premiere">Premiere Pro</option>
+          <option value="fotogrfi">Photography</option>
+          <option value="digitalart">Digital Art</option>
+          <option value="traditionalart">Traditional Art</option>
+        </select>
+      </div>
+
+      <div class="portfolio-grid" id="portfolioGrid">
+        <!-- Dynamic uploads will be injected here -->
+      </div>
+
+      <div style="text-align:center;margin-top:2rem">
+        <a href="upload.html" class="btn" style="display:inline-block;padding:12px 22px;border-radius:999px;background:var(--accent);color:#081019;text-decoration:none;font-weight:800;box-shadow:0 10px 30px rgba(255,152,0,0.08);transition:transform .2s,box-shadow .2s;">Upload Karya Baru</a>
+      </div>
+    </section>
+  </main>
+
+  <div class="to-top" id="toTop" title="Kembali ke atas"><i class="fas fa-chevron-up"></i></div>
+
+  <!-- modal for preview/analyzer -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="inner">
+      <button id="modalClose" style="float:right;background:transparent;border:none;color:var(--muted);font-size:18px;cursor:pointer">&times;</button>
+      <img id="modalImg" src="" alt="preview" onerror="this.src='IMAGES/placeholder.jpg'">
+      <div class="meta" id="modalMeta"></div>
+    </div>
+  </div>
+
+  <!-- modal for delete confirmation -->
+  <div id="deleteModal" class="modal-delete" aria-hidden="true">
+    <div class="inner">
+      <button id="deleteModalClose" class="close">&times;</button>
+      <h3>Konfirmasi Hapus</h3>
+      <p>Masukkan kode untuk menghapus karya ini:</p>
+      <input type="password" id="deleteCode" placeholder="Masukkan kode..." style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;margin-bottom:1rem;transition:border-color 0.3s;">
+      <div id="deleteError" class="error">Mohon maaf kode anda salah</div>
+      <div id="deleteSuccess" class="success">Karya berhasil dihapus</div>
+      <div class="buttons">
+        <button id="deleteConfirm">Hapus</button>
+        <button id="deleteCancel">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- lightbox for gallery -->
+  <div id="lightbox" class="lightbox" aria-hidden="true">
+    <span class="close" id="lightboxClose">&times;</span>
+    <img id="lightboxImg" src="" alt="lightbox">
+  </div>
+
+  <script>
+    /* ---------- Configuration ---------- */
+    const APPS = ['blender','zbrush','substance','photoshop','premiere','fotogrfi','digitalart','traditionalart'];
+
+    /* ---------- Helpers ---------- */
+    function getJSON(key, fallback){ try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }catch(e){ return fallback; } }
+    function saveJSON(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+    /* ---------- Load all uploads and update UI ---------- */
+    function loadUploads(){
+      const uploads = getJSON('portfolio_uploads', []);
+      const perApps = {};
+      APPS.forEach(a=> perApps[a] = getJSON(a + '_projects', []));
+      // build combined list (uploads first)
+      const combined = (uploads || []).slice();
+      // include legacy per-app items not already in uploads
+      APPS.forEach(app=>{
+        perApps[app].forEach(p=>{
+          if(!combined.find(u=>u.id && u.id === p.id)){
+            combined.push({
+              id: p.id || ('legacy_'+Date.now()),
+              app: app,
+              imageData: p.image || p.imageData || '',
+              description: p.desc || p.description || '',
+              userScores: p.userScores || {},
+              aiScores: p.aiScores || {},
+              finalScores: p.finalScores || {},
+              totalPercent: p.totalPercent || 0,
+              aiText: p.aiText || '',
+              timestamp: p.timestamp || new Date().toISOString()
+            });
+          }
+        });
+      });
+
+      // sort by totalPercent desc (highest skill first)
+      combined.sort((a,b)=> (b.totalPercent || 0) - (a.totalPercent || 0));
+
+      const grid = document.getElementById('portfolioGrid');
+      // clear grid
+      grid.innerHTML = '';
+
+      combined.forEach(u=>{
+        // create card
+        const card = document.createElement('div'); card.className = 'card';
+        const img = document.createElement('img'); img.src = u.imageData || 'IMAGES/placeholder.jpg'; img.alt = u.description || '';
+        const h = document.createElement('h3'); h.textContent = (u.app? u.app.toUpperCase() + ' — Karya' : 'Karya');
+        const p = document.createElement('p'); p.textContent = (u.description || '').slice(0,140) + ((u.description && u.description.length>140)?'...':'');
+        card.appendChild(img); card.appendChild(h); card.appendChild(p);
+        card.addEventListener('click', ()=> openModal(u));
+        grid.appendChild(card);
+      });
+
+      // attach lightbox to portfolio images
+      document.querySelectorAll('#portfolioGrid .card img').forEach(img => {
+        img.addEventListener('click', (e) => {
+          e.stopPropagation(); // prevent modal
+          openLightbox(img.src, img.alt);
+        });
+      });
+    }
+
+    /* ---------- Search and Filter ---------- */
+    function filterCards(){
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const filterApp = document.getElementById('filterSelect').value;
+      const cards = document.querySelectorAll('#portfolioGrid .card');
+      cards.forEach(card => {
+        const title = card.querySelector('h3').textContent.toLowerCase();
+        const desc = card.querySelector('p').textContent.toLowerCase();
+        const app = card.querySelector('h3').textContent.split(' — ')[0].toLowerCase();
+        const matchesSearch = title.includes(searchTerm) || desc.includes(searchTerm);
+        const matchesFilter = !filterApp || app === filterApp;
+        card.style.display = matchesSearch && matchesFilter ? 'block' : 'none';
+      });
+    }
+
+    /* ---------- Modal / Analyzer ---------- */
+    const modal = document.getElementById('modal');
+    const modalImg = document.getElementById('modalImg');
+    const modalMeta = document.getElementById('modalMeta');
+    const modalClose = document.getElementById('modalClose');
+
+    function openModal(u){
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      modalImg.src = u.imageData || 'IMAGES/placeholder.jpg';
+      modalMeta.innerHTML = `<div style="color:var(--muted)"><strong>${u.app?u.app.toUpperCase():'Project'}</strong> — Uploaded: ${new Date(u.timestamp||Date.now()).toLocaleString()}</div>
+        <div style="margin-top:8px;color:var(--muted)">${u.description||''}</div>
+        <div style="margin-top:8px;color:var(--muted)"><strong>Final Skill:</strong> ${u.totalPercent? u.totalPercent+'%' : '—'}</div>
+        <div style="margin-top:8px;color:var(--muted)"><strong>AI summary:</strong> ${u.aiText || '(tidak ada)'}</div>
+        <button class="delete-btn" onclick="window.location.href='upload.html?edit=${u.id || u.timestamp}'" style="background:#333;color:#fff;">Edit</button>
+        <button class="delete-btn" onclick="openDeleteModal('${u.id || u.timestamp}')">Hapus</button>`;
+    }
+    modalClose.addEventListener('click', ()=>{ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); });
+    modal.addEventListener('click', (e)=>{ if(e.target === modal) { modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); } });
+
+    /* ---------- Lightbox ---------- */
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    function openLightbox(src, alt){
+      lightbox.classList.add('open');
+      lightbox.setAttribute('aria-hidden','false');
+      lightboxImg.src = src;
+      lightboxImg.alt = alt;
+    }
+    lightboxClose.addEventListener('click', ()=>{ lightbox.classList.remove('open'); lightbox.setAttribute('aria-hidden','true'); });
+    lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox) { lightbox.classList.remove('open'); lightbox.setAttribute('aria-hidden','true'); } });
+
+    /* ---------- Delete Upload ---------- */
+    function openDeleteModal(id){
+      const deleteModal = document.getElementById('deleteModal');
+      deleteModal.classList.add('open');
+      deleteModal.setAttribute('aria-hidden','false');
+      document.getElementById('deleteCode').value = '';
+      document.getElementById('deleteError').style.display = 'none';
+      document.getElementById('deleteSuccess').style.display = 'none';
+
+      document.getElementById('deleteConfirm').onclick = () => {
+        const code = document.getElementById('deleteCode').value;
+        // Obfuscated delete code check. This is NOT true security.
+        // "061008" -> btoa("061008") -> "MDYxMDA4"
+        if(code === atob("MDYxMDA4")){
+          const uploads = getJSON('portfolio_uploads', []);
+          const filtered = uploads.filter(u => (u.id || u.timestamp) !== id);
+          saveJSON('portfolio_uploads', filtered);
+          document.getElementById('deleteSuccess').style.display = 'block';
+          setTimeout(() => {
+            // Close all modals
+            deleteModal.classList.remove('open');
+            deleteModal.setAttribute('aria-hidden','true');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden','true');
+            // Reload data to refresh UI
+            loadUploads();
+            document.getElementById('deleteSuccess').style.display = 'none';
+          }, 2000);
+        } else {
+          document.getElementById('deleteError').style.display = 'block';
+          document.getElementById('deleteCode').classList.add('shake');
+          setTimeout(() => {
+            document.getElementById('deleteCode').classList.remove('shake');
+          }, 500);
+        }
+      };
+
+      document.getElementById('deleteCancel').onclick = () => {
+        deleteModal.classList.remove('open');
+        deleteModal.setAttribute('aria-hidden','true');
+      };
+
+      deleteModal.addEventListener('click', (e) => {
+        if(e.target === deleteModal) {
+          deleteModal.classList.remove('open');
+          deleteModal.setAttribute('aria-hidden','true');
+        }
+      });
+    }
+
+    /* ---------- Mobile Menu Toggle ---------- */
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const navLinks = document.getElementById('navLinks');
+
+    mobileMenuToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      mobileMenuToggle.classList.toggle('active');
+    });
+
+    // Close mobile menu when clicking a link
+    navLinks.addEventListener('click', (e) => {
+      if(e.target.tagName === 'A'){
+        navLinks.classList.remove('active');
+        mobileMenuToggle.classList.remove('active');
+      }
+    });
+
+    /* ---------- Keyboard Navigation ---------- */
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape'){
+        if(modal.classList.contains('open')) modalClose.click();
+        if(lightbox.classList.contains('open')) lightboxClose.click();
+        if(navLinks.classList.contains('active')){
+          navLinks.classList.remove('active');
+          mobileMenuToggle.classList.remove('active');
+        }
+      }
+    });
+
+    /* ---------- Utilities & init ---------- */
+    document.getElementById('toTop').addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
+
+    // initial load
+    document.addEventListener('DOMContentLoaded', ()=> {
+      loadUploads();
+      // add event listeners for search and filter
+      document.getElementById('searchInput').addEventListener('input', filterCards);
+      document.getElementById('filterSelect').addEventListener('change', filterCards);
+    });
+  </script>
+</body>
+</html>

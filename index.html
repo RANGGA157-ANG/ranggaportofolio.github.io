@@ -74,7 +74,7 @@
     .hero-content{position:relative;z-index:3;max-width:900px}
     .hero h1{font-size:3rem;margin:0 0 0.5rem;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.5)}
     .hero p{margin:0 0 1rem;color:var(--muted);font-size:1.05rem;text-shadow:0 1px 5px rgba(0,0,0,0.3)}
-    .btn{
+    .btn, button[type=submit]{
       display:inline-block;padding:12px 22px;border-radius:999px;background:var(--accent);color:#081019;text-decoration:none;font-weight:800;box-shadow:var(--accent-glow);
       transition:transform .2s,box-shadow .2s;
       position:relative;z-index:3;
@@ -85,7 +85,7 @@
     .container{max-width:var(--maxw);margin:0 auto;padding:0 1rem}
 
     /* About */
-    .about{display:flex;gap:2.5rem;align-items:center;justify-content:space-between;padding:3rem 2rem;max-width:var(--maxw);margin:0 auto}
+    .about{display:flex;gap:2.5rem;align-items:center;justify-content:space-between;padding:4rem 2rem;max-width:var(--maxw);margin:0 auto}
     .about-image{flex:0 0 420px;position:relative}
     .about-image img{width:420px;height:420px;object-fit:cover;border-radius:20px;border:6px solid rgba(255,152,0,0.07);box-shadow:0 28px 60px rgba(2,6,23,0.6);transition:transform .3s ease}
     .about-image img:hover{transform:scale(1.02)}
@@ -93,23 +93,24 @@
     .about-image:hover::before{opacity:1}
     .about-content{flex:1}
     .about-content h2{margin:0 0 0.75rem;color:var(--accent);font-size:2rem}
-    .about-content p{color:var(--muted);line-height:1.8;font-size:1.05rem}
+    .about-content p{color:var(--muted);line-height:1.9;font-size:1.05rem}
 
     /* Skills */
-    .skills{background:linear-gradient(180deg, rgba(255,152,0,0.02), rgba(255,152,0,0.01));padding:3.5rem 2rem}
+    .skills{background:linear-gradient(180deg, rgba(255,152,0,0.02), rgba(255,152,0,0.01));padding:4rem 2rem}
     .section-head{max-width:var(--maxw);margin:0 auto 1rem;padding:0 1rem}
     .section-head h2{color:#fff;margin:0;font-size:1.8rem}
 
     .skills-grid{max-width:1400px;margin:1.25rem auto;display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;padding:0 1rem}
     .skill-card{
       background:linear-gradient(180deg,var(--panel), #07101a);
-      border-radius:14px;padding:1rem;box-shadow:0 8px 30px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.02);display:flex;flex-direction:column;justify-content:space-between;min-height:140px;
+      border-radius:14px;padding:1rem;box-shadow:0 8px 30px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.02);display:flex;flex-direction:column;
       transition:transform .3s ease, box-shadow .3s ease;
       cursor:pointer;
     }
     .skill-card:hover{transform:translateY(-5px);box-shadow:0 15px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,152,0,0.1)}
     .skill-card h3{margin:0 0 0.5rem;color: #fff;font-size:1.05rem}
     .skill-card p{margin:0;color:var(--muted);font-size:0.95rem}
+    .skill-card .btn{margin-top:auto; font-size:0.8rem; padding:8px 16px; text-align:center;}
     .skill-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
     .progress{background:rgba(255,255,255,0.04);height:12px;border-radius:999px;margin:10px 0;overflow:hidden;flex:1;margin-right:12px}
     .progress .progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),#f6c26a);width:0;transition:width 0.9s cubic-bezier(.2,.9,.2,1)}
@@ -117,17 +118,33 @@
     /* make 2 rows with 3 columns -> grid above handles 3 columns; for 2 rows just ensure enough cards exist */
 
     /* Portfolio */
-    .portfolio{padding:3rem 2rem}
+    .portfolio{padding:4rem 2rem}
     .portfolio-grid{max-width:var(--maxw);margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem;padding:0 1rem}
-    .portfolio .card{background:linear-gradient(180deg,#071427,#05101b);padding:0;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.02);transition:transform .3s ease, box-shadow .3s ease}
+    .portfolio .card{background:linear-gradient(180deg,#071427,#05101b);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.02);transition:transform .3s ease, box-shadow .3s ease; display:flex; flex-direction:column;}
     .portfolio .card:hover{transform:translateY(-8px);box-shadow:0 20px 50px rgba(0,0,0,0.8), 0 0 25px rgba(255,152,0,0.1)}
     .portfolio img{width:100%;height:220px;object-fit:cover;display:block;transition:transform .3s ease}
     .portfolio .card:hover img{transform:scale(1.05)}
-    .portfolio .card h3{padding:1rem 1rem 0;margin:0}
-    .portfolio .card p{padding:0 1rem 1rem;margin:0;color:var(--muted)}
+    .portfolio .card-content{padding:1rem; flex-grow:1; display:flex; flex-direction:column;}
+    .portfolio .card h3{margin:0 0 0.5rem;}
+    .portfolio .card p{margin:0;color:var(--muted); flex-grow:1;}
+    .portfolio-filters{display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;align-items:center;}
+    .portfolio-filters input, .portfolio-filters select{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;font-family:inherit;}
+    .portfolio-filters input{flex:1;min-width:200px;}
+
+    /* Styles for active filter select */
+    #filterSelect.filter-active {
+      background: var(--accent);
+      color: var(--bg-dark); /* Dark text on accent background */
+      border-color: var(--accent);
+    }
+    /* Styles for cards in filtered view */
+    .portfolio-grid.filtered-view .card {
+      background: linear-gradient(180deg, #1a2a40, #101a2a); /* Slightly different background */
+      color: #eaf3fb; /* Brighter text color for better readability */
+    }
 
     /* Traditional & digital */
-    .gallery-art{padding:3rem 2rem}
+    .gallery-art{padding:4rem 2rem}
     .art-grid{max-width:var(--maxw);margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;padding:0 1rem}
     .art-item{position:relative;overflow:hidden;border-radius:12px}
     .art-item img{width:100%;height:320px;object-fit:cover;border-radius:10px;transition:transform .3s,box-shadow .3s}
@@ -136,7 +153,7 @@
     .art-item:hover::before{opacity:1}
 
     /* Gallery photos */
-    .photo-gallery{padding:2rem}
+    .photo-gallery{padding:3rem 2rem}
     .photo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;max-width:var(--maxw);margin:0 auto;padding:0 1rem}
     .photo-grid img{width:100%;height:160px;object-fit:cover;border-radius:12px;transition:transform .3s ease, box-shadow .3s ease;cursor:pointer;border:2px solid transparent}
     .photo-grid img:hover{transform:scale(1.05);box-shadow:0 15px 35px rgba(0,0,0,0.4);border-color:var(--accent)}
@@ -149,7 +166,7 @@
     .photo-grid .photo-overlay p{margin:5px 0 0;font-size:0.85rem;color:#ccc}
 
     /* Upload section */
-    .upload{padding:3rem 2rem;background:linear-gradient(180deg,#07141b,#061018);border-top:1px solid rgba(255,255,255,0.02)}
+    .upload{padding:4rem 2rem;background:linear-gradient(180deg,#07141b,#061018);border-top:1px solid rgba(255,255,255,0.02)}
     .upload .card{max-width:920px;margin:0 auto;padding:16px;border-radius:10px;background:linear-gradient(180deg,#08121a,#061018)}
     .upload label{display:block;margin-top:8px;color:var(--muted);font-weight:700}
     .upload input[type=file], .upload textarea, .upload select, .upload input[type=number]{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;margin-top:6px}
@@ -157,17 +174,19 @@
     .upload .col{flex:1;min-width:140px}
 
     /* Social */
-    .contact{padding:3rem 2rem;background:linear-gradient(180deg,#041018,#031018);border-top:1px solid rgba(255,255,255,0.02)}
+    .contact{padding:4rem 2rem;background:linear-gradient(180deg,#041018,#031018);border-top:1px solid rgba(255,255,255,0.02)}
     .contact-grid{display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap}
     .contact-grid a{width:56px;height:56px;border-radius:999px;background:linear-gradient(180deg,var(--accent),#e68a00);display:inline-flex;align-items:center;justify-content:center;color:#071019;font-size:20px;text-decoration:none;box-shadow:var(--accent-glow);transition:transform .3s ease, box-shadow .3s ease}
     .contact-grid a:hover{transform:translateY(-3px) scale(1.1);box-shadow:0 15px 35px rgba(255,152,0,0.3)}
 
     /* modal analyzer */
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity .2s}
-    .modal.open{opacity:1;pointer-events:auto}
-    .modal .inner{max-width:1000px;width:100%;background:#081018;padding:12px;border-radius:10px}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity .3s ease, transform .3s ease;transform:scale(0.9);z-index:9999}
+    .modal.open{opacity:1;pointer-events:auto;transform:scale(1)}
+    .modal .inner{max-width:1000px;width:100%;background:#081018;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);box-shadow:0 20px 60px rgba(0,0,0,0.8), 0 0 20px rgba(255,152,0,0.1)}
     .modal img{width:100%;height:auto;border-radius:8px}
     .modal .meta{padding:8px 6px;color:var(--muted)}
+    .modal .delete-btn{background:var(--accent);color:#081019;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:700;margin-top:10px;transition:transform .2s ease, box-shadow .2s ease}
+    .modal .delete-btn:hover{background:#e68a00;transform:translateY(-2px);box-shadow:0 10px 25px rgba(255,152,0,0.3)}
 
     /* lightbox for gallery */
     .lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s}
@@ -180,10 +199,10 @@
     .to-top:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 12px 35px rgba(0,0,0,0.8), 0 0 15px rgba(255,152,0,0.2)}
     @media (max-width:1200px){
       .about{flex-direction:column;align-items:center;text-align:center}
-      .about-image img{width:320px;height:320px}
+      .about-image img{width:300px;height:300px}
       .skills-grid{grid-template-columns:repeat(3,1fr)}
       .hero h1{font-size:2.5rem}
-      .hero p{font-size:1.1rem}
+      .hero p{font-size:1.1rem; max-width: 80%; margin-left: auto; margin-right: auto;}
     }
     @media (max-width:900px){
       .skills-grid{grid-template-columns:repeat(2,1fr)}
@@ -195,12 +214,12 @@
       .photo-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
     }
     @media (max-width:700px){
-      .nav-links{display:none}
-      .mobile-menu-toggle{display:flex}
+      .nav-links{display:none;}
+      .mobile-menu-toggle{display:flex; z-index: 100;}
       .skills-grid{grid-template-columns:1fr}
-      .about-image img{width:260px;height:260px}
+      .about-image img{width:240px;height:240px}
       .hero{min-height:70vh;padding:3rem 1.5rem}
-      .hero h1{font-size:1.8rem}
+      .hero h1{font-size:2rem; line-height: 1.3;}
       .hero p{font-size:0.95rem}
       .portfolio-grid{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
       .art-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
@@ -217,11 +236,11 @@
     }
     @media (max-width:480px){
       .hero{min-height:60vh;padding:2.5rem 1rem}
-      .hero h1{font-size:1.6rem}
-      .hero p{font-size:0.9rem}
+      .hero h1{font-size:1.8rem}
+      .hero p{font-size:1rem; line-height:1.7;}
       .about{padding:2rem 1rem}
       .about-image img{width:220px;height:220px}
-      .skills{padding:2.5rem 1rem}
+      .skills{padding:2rem 1rem}
       .portfolio{padding:2rem 1rem}
       .gallery-art{padding:2rem 1rem}
       .photo-gallery{padding:1.5rem 1rem}
@@ -234,10 +253,25 @@
       .photo-grid .photo-overlay{padding:10px}
       .photo-grid .photo-overlay h4{font-size:0.85rem}
       .photo-grid .photo-overlay p{font-size:0.75rem}
-      .btn{padding:10px 18px;font-size:0.9rem}
+      .btn, button[type=submit]{padding:10px 18px;font-size:0.9rem}
       .nav{max-width:none;padding:0.75rem 1rem}
       .nav h1{font-size:0.9rem}
       .to-top{right:12px;bottom:12px;width:44px;height:44px}
+    }
+
+    .shake {
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
@@ -304,7 +338,7 @@
             <div class="progress"><div id="blender-bar" class="progress-bar" data-value="0%"></div></div>
             <div style="width:48px;text-align:right;font-weight:800;color:var(--accent)" id="blender-percent">0%</div>
           </div>
-          <a href="blender.html" class="btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;">Lihat Karya</a>
+          <a href="blender.html" class="btn">Lihat Karya</a>
         </div>
 
         <div class="skill-card">
@@ -314,7 +348,7 @@
             <div class="progress"><div id="zbrush-bar" class="progress-bar" data-value="0%"></div></div>
             <div style="width:48px;text-align:right;font-weight:800;color:var(--accent)" id="zbrush-percent">0%</div>
           </div>
-          <a href="zbrush.html" class="btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;">Lihat Karya</a>
+          <a href="zbrush.html" class="btn">Lihat Karya</a>
         </div>
 
         <div class="skill-card">
@@ -324,7 +358,7 @@
             <div class="progress"><div id="substance-bar" class="progress-bar" data-value="0%"></div></div>
             <div style="width:48px;text-align:right;font-weight:800;color:var(--accent)" id="substance-percent">0%</div>
           </div>
-          <a href="substance.html" class="btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;">Lihat Karya</a>
+          <a href="substance.html" class="btn">Lihat Karya</a>
         </div>
 
         <div class="skill-card">
@@ -334,7 +368,7 @@
             <div class="progress"><div id="photoshop-bar" class="progress-bar" data-value="0%"></div></div>
             <div style="width:48px;text-align:right;font-weight:800;color:var(--accent)" id="photoshop-percent">0%</div>
           </div>
-          <a href="photoshop.html" class="btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;">Lihat Karya</a>
+          <a href="photoshop.html" class="btn">Lihat Karya</a>
         </div>
 
         <div class="skill-card">
@@ -344,7 +378,7 @@
             <div class="progress"><div id="illustrator-bar" class="progress-bar" data-value="0%"></div></div>
             <div style="width:48px;text-align:right;font-weight:800;color:var(--accent)" id="illustrator-percent">0%</div>
           </div>
-          <a href="illustrator.html" class="btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;">Lihat Karya</a>
+          <a href="illustrator.html" class="btn">Lihat Karya</a>
         </div>
 
         <div class="skill-card">
@@ -354,7 +388,7 @@
             <div class="progress"><div id="premiere-bar" class="progress-bar" data-value="0%"></div></div>
             <div style="width:48px;text-align:right;font-weight:800;color:var(--accent)" id="premiere-percent">0%</div>
           </div>
-          <a href="premierpro.html" class="btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;">Lihat Karya</a>
+          <a href="premierpro.html" class="btn">Lihat Karya</a>
         </div>
 
         <div class="skill-card">
@@ -364,7 +398,7 @@
             <div class="progress"><div id="photography-bar" class="progress-bar" data-value="0%"></div></div>
             <div style="width:48px;text-align:right;font-weight:800;color:var(--accent)" id="photography-percent">0%</div>
           </div>
-          <a href="fotogrfi.html" class="btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;">Lihat Galeri</a>
+          <a href="fotogrfi.html" class="btn">Lihat Galeri</a>
         </div>
 
         <div class="skill-card">
@@ -374,7 +408,7 @@
             <div class="progress"><div id="aftereffects-bar" class="progress-bar" data-value="0%"></div></div>
             <div style="width:48px;text-align:right;font-weight:800;color:var(--accent)" id="aftereffects-percent">0%</div>
           </div>
-          <a href="aftereffects.html" class="btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;">Lihat Karya</a>
+          <a href="aftereffects.html" class="btn">Lihat Karya</a>
         </div>
 
         <div class="skill-card">
@@ -384,7 +418,7 @@
             <div class="progress"><div id="digitalart-bar" class="progress-bar" data-value="0%"></div></div>
             <div style="width:48px;text-align:right;font-weight:800;color:var(--accent)" id="digitalart-percent">0%</div>
           </div>
-          <a href="digitalart.html" class="btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;">Lihat Karya</a>
+          <a href="Digital Art.html" class="btn">Lihat Karya</a>
         </div>
 
         <div class="skill-card">
@@ -394,7 +428,7 @@
             <div class="progress"><div id="traditionalart-bar" class="progress-bar" data-value="0%"></div></div>
             <div style="width:48px;text-align:right;font-weight:800;color:var(--accent)" id="traditionalart-percent">0%</div>
           </div>
-          <a href="traditionalart.html" class="btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;">Lihat Karya</a>
+          <a href="traditionalart.html" class="btn">Lihat Karya</a>
         </div>
       </div>
     </section>
@@ -407,9 +441,9 @@
       </div>
 
       <!-- Search and Filter -->
-      <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
-        <input type="text" id="searchInput" placeholder="Cari berdasarkan deskripsi..." style="flex:1;min-width:200px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;">
-        <select id="filterSelect" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;">
+      <div class="portfolio-filters">
+        <input type="text" id="searchInput" placeholder="Cari berdasarkan deskripsi...">
+        <select id="filterSelect">
           <option value="">Semua Aplikasi</option>
           <option value="blender">Blender</option>
           <option value="zbrush">ZBrush</option>
@@ -427,20 +461,26 @@
         <!-- static examples (ke-3 awal) -->
         <div class="card">
           <img src="IMAGES/blander1.jpeg" alt="3D Environment Sci-fi" loading="lazy" onerror="this.src='IMAGES/placeholder.jpg'">
-          <h3>3D Environment Design</h3>
-          <p>Futuristic sci-fi environment created in Blender with Substance Painter.</p>
+          <div class="card-content">
+            <h3>3D Environment Design</h3>
+            <p>Futuristic sci-fi environment created in Blender with Substance Painter.</p>
+          </div>
         </div>
 
         <div class="card">
           <img src="IMAGES/blander2.jpeg" alt="Digital Poster Design" loading="lazy" onerror="this.src='IMAGES/placeholder.jpg'">
-          <h3>3d label_modeling</h3>
-          <p>Creative poster design combining 3D elements with dynamic typography.</p>
+          <div class="card-content">
+            <h3>3d label_modeling</h3>
+            <p>Creative poster design combining 3D elements with dynamic typography.</p>
+          </div>
         </div>
 
         <div class="card">
           <img src="IMAGES/blander3.jpeg" alt="3D Character Concept" loading="lazy" onerror="this.src='IMAGES/placeholder.jpg'">
-          <h3>3D Character Concept</h3>
-          <p>Stylized 3D character design created with Blender and detailed in ZBrush.</p>
+          <div class="card-content">
+            <h3>3D Character Concept</h3>
+            <p>Stylized 3D character design created with Blender and detailed in ZBrush.</p>
+          </div>
         </div>
 
         <!-- dynamic uploads will be injected after the static cards -->
@@ -454,111 +494,18 @@
     <!-- KARYA TRADISIONAL & DIGITAL -->
     <section id="GalleryArt" class="gallery-art container">
       <h2>Karya Tradisional & Digital</h2>
-      <p style="color:var(--muted)">Kumpulan karya seni tradisional dan digital painting yang saya buat.</p>
+      <p style="color:var(--muted)">10 karya terbaik dari kategori Digital Art dan Traditional Art.</p>
       <div class="art-grid">
-        <div class="art-item"><img src="IMAGES/art md 1.jpeg" alt="Sketsa Wajah Realis" onerror="this.src='IMAGES/placeholder.jpg'"></div>
-        <div class="art-item"><img src="IMAGES/art md 2.jpeg" alt="Lukisan Cat Air Pemandangan" onerror="this.src='IMAGES/placeholder.jpg'"></div>
-        <div class="art-item"><img src="IMAGES/art td 1.jpeg" alt="Ilustrasi Digital Fantasi" onerror="this.src='IMAGES/placeholder.jpg'"></div>
-        <div class="art-item"><img src="IMAGES/art td 2.jpeg" alt="Digital Painting" onerror="this.src='IMAGES/placeholder.jpg'"></div>
+        <!-- Top 10 Digital/Traditional Art akan dimuat di sini -->
       </div>
     </section>
 
     <!-- GALLERY FOTO -->
     <section class="photo-gallery container">
       <h2>Gallery Foto</h2>
-      <p style="color:var(--muted);margin-bottom:2rem">Koleksi foto yang menampilkan kreativitas dan momen berharga. Klik untuk melihat lebih detail.</p>
+      <p style="color:var(--muted);margin-bottom:2rem">10 karya fotografi terbaik dari koleksi saya. Klik untuk melihat lebih detail.</p>
       <div class="photo-grid">
-        <div class="photo-item">
-          <img src="IMAGES/foto13.jpeg" alt="Foto 13 - Portrait candid" onerror="this.src='IMAGES/placeholder.jpg'">
-          <div class="photo-overlay">
-            <h4>Portrait Candid</h4>
-            <p>Momen spontan yang penuh ekspresi</p>
-          </div>
-        </div>
-        <div class="photo-item">
-          <img src="IMAGES/foto12.jpeg" alt="Foto 12 - Landscape sunset" onerror="this.src='IMAGES/placeholder.jpg'">
-          <div class="photo-overlay">
-            <h4>Landscape Sunset</h4>
-            <p>Kejelasan cahaya matahari terbenam</p>
-          </div>
-        </div>
-        <div class="photo-item">
-          <img src="IMAGES/foto19.jpeg" alt="Foto 19 - Street photography" onerror="this.src='IMAGES/placeholder.jpg'">
-          <div class="photo-overlay">
-            <h4>Street Photography</h4>
-            <p>Dinamika kehidupan kota</p>
-          </div>
-        </div>
-        <div class="photo-item">
-          <img src="IMAGES/foto1.jpeg" alt="Foto 1 - Nature close-up" onerror="this.src='IMAGES/placeholder.jpg'">
-          <div class="photo-overlay">
-            <h4>Nature Close-up</h4>
-            <p>Detail tekstur alam yang menakjubkan</p>
-          </div>
-        </div>
-        <div class="photo-item">
-          <img src="IMAGES/foto2.jpeg" alt="Foto 2 - Architectural detail" onerror="this.src='IMAGES/placeholder.jpg'">
-          <div class="photo-overlay">
-            <h4>Architectural Detail</h4>
-            <p>Geometri dan pola dalam arsitektur</p>
-          </div>
-        </div>
-        <div class="photo-item">
-          <img src="IMAGES/foto3.jpeg" alt="Foto 3 - Black and white portrait" onerror="this.src='IMAGES/placeholder.jpg'">
-          <div class="photo-overlay">
-            <h4>B&W Portrait</h4>
-            <p>Ekspresi melalui kontras hitam putih</p>
-          </div>
-        </div>
-        <div class="photo-item">
-          <img src="IMAGES/foto4.jpeg" alt="Foto 4 - Macro photography" onerror="this.src='IMAGES/placeholder.jpg'">
-          <div class="photo-overlay">
-            <h4>Macro Photography</h4>
-            <p>Dunia kecil yang penuh keajaiban</p>
-          </div>
-        </div>
-        <div class="photo-item">
-          <img src="IMAGES/foto5.jpeg" alt="Foto 5 - Golden hour shot" onerror="this.src='IMAGES/placeholder.jpg'">
-          <div class="photo-overlay">
-            <h4>Golden Hour</h4>
-            <p>Cahaya emas yang mempesona</p>
-          </div>
-        </div>
-        <div class="photo-item">
-          <img src="IMAGES/foto6.jpeg" alt="Foto 6 - Urban exploration" onerror="this.src='IMAGES/placeholder.jpg'">
-          <div class="photo-overlay">
-            <h4>Urban Exploration</h4>
-            <p>Jejak sejarah di tengah modernitas</p>
-          </div>
-        </div>
-        <div class="photo-item">
-          <img src="IMAGES/foto7.jpeg" alt="Foto 7 - Wildlife moment" onerror="this.src='IMAGES/placeholder.jpg'">
-          <div class="photo-overlay">
-            <h4>Wildlife Moment</h4>
-            <p>Keindahan alam liar yang langka</p>
-          </div>
-        </div>
-        <div class="photo-item">
-          <img src="IMAGES/foto8.jpeg" alt="Foto 8 - Abstract composition" onerror="this.src='IMAGES/placeholder.jpg'">
-          <div class="photo-overlay">
-            <h4>Abstract Composition</h4>
-            <p>Bentuk dan warna dalam harmoni</p>
-          </div>
-        </div>
-        <div class="photo-item">
-          <img src="IMAGES/foto11.jpeg" alt="Foto 11 - Event photography" onerror="this.src='IMAGES/placeholder.jpg'">
-          <div class="photo-overlay">
-            <h4>Event Photography</h4>
-            <p>Momen spesial yang tak terlupakan</p>
-          </div>
-        </div>
-        <div class="photo-item">
-          <img src="IMAGES/foto10.jpeg" alt="Foto 10 - Minimalist still life" onerror="this.src='IMAGES/placeholder.jpg'">
-          <div class="photo-overlay">
-            <h4>Minimalist Still Life</h4>
-            <p>Kesederhanaan yang bermakna</p>
-          </div>
-        </div>
+        <!-- Top 10 Photography akan dimuat di sini -->
       </div>
     </section>
 
@@ -621,6 +568,22 @@
     </div>
   </div>
 
+  <!-- modal for delete confirmation -->
+  <div id="deleteModal" class="modal" aria-hidden="true">
+    <div class="inner" style="max-width:400px;text-align:center;position:relative;">
+      <button id="deleteModalClose" style="position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;transition:color 0.2s;">&times;</button>
+      <h3 style="color:#fff;margin-bottom:1rem;">Konfirmasi Hapus</h3>
+      <p style="color:var(--muted);margin-bottom:1rem;">Masukkan kode untuk menghapus karya ini:</p>
+      <input type="password" id="deleteCode" placeholder="Masukkan kode..." style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;margin-bottom:1rem;transition:border-color 0.3s;">
+      <div id="deleteError" style="color:#ff6b6b;margin-bottom:1rem;display:none;animation:fadeIn 0.5s;">Mohon maaf kode anda salah</div>
+      <div id="deleteSuccess" style="color:#4caf50;margin-bottom:1rem;display:none;animation:fadeIn 0.5s;">Karya berhasil dihapus</div>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button id="deleteConfirm" class="btn" style="flex:1;padding:10px;transition:transform 0.2s, box-shadow 0.2s;">Hapus</button>
+        <button id="deleteCancel" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;cursor:pointer;transition:background 0.2s;">Batal</button>
+      </div>
+    </div>
+  </div>
+
   <!-- lightbox for gallery -->
   <div id="lightbox" class="lightbox" aria-hidden="true">
     <span class="close" id="lightboxClose">&times;</span>
@@ -629,71 +592,133 @@
 
   <script>
     /* ---------- Configuration ---------- */
-    const APPS = ['blender','zbrush','substance','photoshop','premiere','fotogrfi','digitalart','traditionalart'];
+    const APPS = ['blender','zbrush','substance','photoshop','premiere','fotogrfi','aftereffects','digitalart','traditionalart'];
     const ASPECT_WEIGHTS = { modeling:30, lighting:15, texturing:25, rendering:15, deskripsi:15 };
 
     /* ---------- Helpers ---------- */
     function getJSON(key, fallback){ try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }catch(e){ return fallback; } }
     function saveJSON(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
 
+    // Unified and authoritative skill summary calculation
+    function getSkillSummary(){
+      const uploads = getJSON('portfolio_uploads', []);
+      const summary = {};
+      APPS.forEach(app=>{
+        const appUploads = uploads.filter(u=>u.app === app);
+        if(appUploads.length > 0){
+          const totalPercent = appUploads.reduce((sum, u)=> sum + (u.totalPercent || 0), 0);
+          summary[app] = { 
+            average: Math.round(totalPercent / appUploads.length),
+            count: appUploads.length
+          };
+        } else {
+          summary[app] = { average: 0, count: 0 };
+        }
+      });
+      return summary;
+    }
+
 
 
     /* ---------- Load uploads and update UI ---------- */
     function loadUploads(){
-      // Reset skill summary to 0%
-      saveJSON('skill_summary', {});
-
       const uploads = getJSON('portfolio_uploads', []);
-      const perApps = {};
-      APPS.forEach(a=> perApps[a] = getJSON(a + '_projects', []));
-      // build combined list (uploads first)
-      const combined = (uploads || []).slice();
-      // include legacy per-app items not already in uploads
-      APPS.forEach(app=>{
-        perApps[app].forEach(p=>{
-          if(!combined.find(u=>u.id && u.id === p.id)){
-            combined.push({
-              id: p.id || ('legacy_'+Date.now()),
-              app: app,
-              imageData: p.image || p.imageData || '',
-              description: p.desc || p.description || '',
-              userScores: p.userScores || {},
-              aiScores: p.aiScores || {},
-              finalScores: p.finalScores || {},
-              totalPercent: p.totalPercent || 0,
-              aiText: p.aiText || '',
-              timestamp: p.timestamp || new Date().toISOString()
-            });
-          }
-        });
-      });
 
-      // sort by timestamp desc
-      combined.sort((a,b)=> new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+      // sort by totalPercent desc (highest skill first)
+      uploads.sort((a,b)=> (b.totalPercent || 0) - (a.totalPercent || 0));
 
       const grid = document.getElementById('portfolioGrid');
+      const summary = getSkillSummary(); // Calculate skill summary
       // remove dynamic children (keep first 3 static)
       while(grid.children.length > 3) grid.removeChild(grid.lastChild);
 
-      combined.forEach(u=>{
+      // limit to top 10 for homepage
+      const displayItems = uploads.slice(0, 10);
+
+      displayItems.forEach(u=>{
         // create card
         const card = document.createElement('div'); card.className = 'card';
-        const img = document.createElement('img'); img.src = u.imageData || 'IMAGES/placeholder.png'; img.alt = u.description || '';
-        const h = document.createElement('h3'); h.textContent = (u.app? u.app.toUpperCase() + ' — Karya' : 'Karya');
-        const p = document.createElement('p'); p.textContent = (u.description || '').slice(0,140) + ((u.description && u.description.length>140)?'...':'');
-        card.appendChild(img); card.appendChild(h); card.appendChild(p);
-        card.addEventListener('click', ()=> openModal(u));
-        grid.appendChild(card);
-      });
+        const cardContent = document.createElement('div'); cardContent.className = 'card-content';
+        const img = document.createElement('img'); vieid = 'viewAllBtn';=  viewAllBtn.innerHTML = '<a h.html" class="btn" style="display:inline-block;">Lihat Selengkapnya</a>';
+        grid.parentNode.insertBefore(viewAllBtn, grid.nextSibling);
+      }
+
+      // --- Populate Gallery Art section (Top 10 Digital/Traditional Art) ---
+      const artGrid = document.querySelector('#GalleryArt .art-grid');
+      if (artGrid) {
+        artGrid.innerHTML = ''; // Clear static content
+        const digitalArtUploads = uploads.filter(u => u.app === 'digitalart' || u.app === 'traditionalart');
+        digitalArtUploads.sort((a,b)=> (b.totalPercent || 0) - (a.totalPercent || 0));
+        const top10Art = digitalArtUploads.slice(0, 10);
+
+        if (top10Art.length === 0) {
+          artGrid.innerHTML = '<p style="text-align:center; padding: 2rem; color: var(--muted);">Belum ada karya Digital/Traditional Art yang diunggah.</p>';
+        } else {
+          top10Art.forEach(u => {
+              const artItem = document.createElement('div');
+              artItem.className = 'art-item';
+              const img = document.createElement('img');
+              img.src = u.imageData || 'IMAGES/placeholder.jpg';
+              img.alt = u.description || '';
+              img.loading = 'lazy';
+              img = "this.src='IMAGES/placeholder.jpg'";t
+              artItem.addEventListener('click', () => openLightbox(img.src, img.alt));
+              artGrid.appendChild(artItem);
+          });
+      }
+
+      // --- Poputo Gallery section (Top 10 Photography) ---oelector('.photo-gallery .photo-grid');
+      if (photoGrid) {
+        photoGrid.innerHTML = ''; // Clear static content
+        const phoUploads = uploads.filter(u => u.app === 'fotp (b.totalPercent || 0) - (a.totalPercent || 0));
+        const top10Photos = photographyUploads.slice(0, 10);
+
+        if (top10ength === 0) {rle="text-align:center; padding: 2rem; color: var(--muted);">Belum ada karya Fotografi yang diunggah.</p>';
+        } else {
+          top10Photos.forEach(u => {
+              conItem = document.createElement('div');ooto-item';
+              const img = document.createElement('img');
+              img.src = u.imageData || 'IMAGES/placeholder.jpg';
+              img.alt = u.description || '';
+              img.loading = 'lazy';
+              img.onerror = "this.src='IMAGES/placeholder.jpg'";
+              photmendChild(img); or consistency with previous static items
+              const overlay = document.createElement('div');
+              overlay.className = 'photo-overlay';
+              const h4 = document.createElement('h4');
+              h4.tot = u.description ? u.description.split(' nnlement('p');
+              p.textContent = (u.description || '').slice(0, 50) + ((u.description && u.description.length > 50) ? '...' : '');
+              overlay.appendChild(h4);
+              overlay.appendChild(p);
+              photmendChild(overlay);
+              photoItem.addEventListener('click', () => openLightbox(img.src, img.alt));
+              photoGrid.appendChild(photoItem);
+          });
+        }
+
+      // Helper function to animate number counting up
+      function animateValue(obj, start, end, duration) {
+        let startTt= null;ep
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          const currentValue = Math.floor(progress * (end - start) + start);
+          obj.inneLurrentValue + '%';o
+            window.requestAnimationFrame(step);
+          }
+        };
+        window.requestAnimationFrame(step);
+      }
 
       // update skill bars from summary
-      const summary = getSkillSummary();
       APPS.forEach(app=>{
         const bar = document.getElementById(app + '-bar');
         const pct = document.getElementById(app + '-percent');
         const avg = summary[app] ? summary[app].average : 0;
-        if(bar) bar.style.width = avg + '%';
-        if(pct) pct.textContent = avg + '%';
+        const oldAvg = parseInt(pct.textContent) || 0;
+
+        if(bar) bar.style.width = avg + '%'; // CSS transition will handle this
+        // Selalu animasikan angka dari 0 ke rata-rata saat ini saat dimuat
+        if(pct) animateValue(pct, 0, avg, 900);
       });
     }
 
@@ -725,7 +750,10 @@
       modalMeta.innerHTML = `<div style="color:var(--muted)"><strong>${u.app?u.app.toUpperCase():'Project'}</strong> — Uploaded: ${new Date(u.timestamp||Date.now()).toLocaleString()}</div>
         <div style="margin-top:8px;color:var(--muted)">${u.description||''}</div>
         <div style="margin-top:8px;color:var(--muted)"><strong>Final Skill:</strong> ${u.totalPercent? u.totalPercent+'%' : '—'}</div>
-        <div style="margin-top:8px;color:var(--muted)"><strong>AI summary:</strong> ${u.aiText || '(tidak ada)'}</div>`;
+        <div style="margin-top:8px;color:var(--muted)"><strong>AI summary:</strong> ${u.aiText || '(tidak ada)'}</div>
+        <button class="delete-btn" onclick="window.location.href='upload.html?edit=${u.id || u.timestamp}'" style="background:#333;color:#fff;">Edit</button>
+        <button class="delete-btn" onclick="openDeleteModal('${u.id || u.timestamp}')">Hapus</button>`;
+      window.location.hash = `karya=${u.id}`;
     }
     modalClose.addEventListener('click', ()=>{ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); });
     modal.addEventListener('click', (e)=>{ if(e.target === modal) { modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); } });
@@ -811,6 +839,60 @@
       }
     });
 
+    /* ---------- Delete Upload ---------- */
+    function openDeleteModal(id){
+      const deleteModal = document.getElementById('deleteModal');
+      deleteModal.classList.add('open');
+      deleteModal.setAttribute('aria-hidden','false');
+      document.getElementById('deleteCode').value = '';
+      document.getElementById('deleteError').style.display = 'none';
+      document.getElementById('deleteSuccess').style.display = 'none';
+
+      document.getElementById('deleteConfirm').onclick = () => {
+        const code = document.getElementById('deleteCode').value;
+        // Pengecekan kode hapus langsung
+        if(code === '061008'){
+          const uploads = getJSON('portfolio_uploads', []);
+          const filtered = uploads.filter(u => (u.id || u.timestamp) !== id);
+          saveJSON('portfolio_uploads', filtered);
+        // Pengecekan kode hapus langsung
+          setTimeout(() => {
+            // Close all modals
+            deleteModal.classList.remove('open');
+            deleteModal.setAttribute('aria-hidden','true');
+        // Pengecekan kode hapus langsung
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden','true');
+            // Reload data to refresh UI
+            loadUploads();
+        // Pengecekan kode hapus langsung
+            filterCards(); // reapply filter
+          }, 500);
+        } else {
+          document.getElementById('deleteError').style.display = 
+        // Pengecekan kode hapus langsung'block';
+          document.getElementById('deleteCode').classList.add('shake');
+          setTimeout(() => {
+            document.getElementById('deleteCode').classList.remove('shake');
+          }, 500);
+        // Pengecekan kode hapus langsung
+        }
+      };
+
+      document.getElementById('deleteCancel').onclick = () => {
+        // Pengecekan kode hapus langsung
+        deleteModal.classList.remove('open');
+        deleteModal.setAttribute('aria-hidden','true');
+      };
+
+      deleteModal.addEventListener('click', (e) => {
+        if(e.target === deleteModal) {
+          deleteModal.classList.remove('open');
+          deleteModal.setAttribute('aria-hidden','true');
+        }
+      });
+    }
+
     /* ---------- Utilities & init ---------- */
     document.getElementById('toTop').addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
 
@@ -864,6 +946,18 @@
           openLightbox(img.src, img.alt);
         });
       });
+
+      // Check for permalink on load
+      if (window.location.hash.startsWith('#karya=')) {
+        const workId = window.location.hash.substring(7);
+        const allUploads = getJSON('portfolio_uploads', []);
+        const workToShow = allUploads.find(u => u.id === workId);
+        if (workToShow) {
+          setTimeout(() => {
+            openModal(workToShow);
+          }, 300); // Small delay to ensure UI is ready
+        }
+      }
     });
 
 

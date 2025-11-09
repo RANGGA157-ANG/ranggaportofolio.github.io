@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Blender 3D — Detail Project</title>
+  <title>Traditional Art — Detail Project</title>
   <style>
     :root{--accent:#ff9800;--muted:#9aa4b2}
-    *{box-sizing:border-box} body{margin:0;font-family:Inter, system-ui, Arial;background:#071018;color:#eaf0f6}
+    *{box-sizing:border-box} 
+    body{margin:0;font-family:Inter, system-ui, Arial;background:#071018;color:#eaf0f6}
     .topbar{background:linear-gradient(180deg,#07101b,#041018);padding:12px 16px;position:sticky;top:0;border-bottom:1px solid rgba(255,255,255,0.03)}
     .topbar a{color:var(--muted);text-decoration:none;font-weight:600}
     .container{max-width:1000px;margin:28px auto;padding:0 16px}
     h1{color:var(--accent);margin:0 0 8px}
     .meta{color:var(--muted);margin-bottom:18px}
     .slider{position:relative;border-radius:10px;overflow:hidden;background:#08121a}
-    .slider-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(20px) brightness(0.4);transform:scale(1.1);transition:background-image .4s ease;z-index:1}
-    .slides{display:flex;transition:transform .45s ease;position:relative;z-index:2}
-    .slides img{width:100%;height:520px;object-fit:contain;flex-shrink:0}
+    .slides{display:flex;transition:transform .45s ease}
+    .slides img, .slides video{width:100%;height:520px;object-fit:contain;flex-shrink:0}
     .nav-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:#fff;padding:10px 12px;border-radius:8px;cursor:pointer}
     .nav-btn.prev{left:12px} .nav-btn.next{right:12px}
     .thumbs{display:flex;gap:8px;margin-top:12px;overflow-x:auto;padding:8px 4px;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--accent) rgba(255,255,255,0.05)}
@@ -29,45 +29,20 @@
     .desc{flex:1;min-width:280px}
     .info{width:300px;min-width:220px;background:linear-gradient(180deg,#081218,#051018);padding:12px;border-radius:8px}
     .back{display:inline-block;margin-top:16px;padding:10px 14px;border-radius:8px;background:var(--accent);color:#071018;text-decoration:none;font-weight:700}
-    @media(max-width:768px){ 
-      .skill-progress{background:#08121a;border-radius:8px;padding:8px;margin-bottom:1rem}
-      .skill-progress h3{color:var(--accent);margin:0 0 8px}
-      .progress-container{background:#041018;border-radius:4px;height:12px;overflow:hidden}
-      .progress-bar{background:linear-gradient(90deg,var(--accent),#ffb74d);height:100%;width:0%;transition:width 1s ease}
-
-      .slides img, .slides video {height:40vh;} 
-      .thumbs img{width:100px;height:65px} 
-      .info{width:100%} 
-      .content{flex-direction:column} 
-      h1 {font-size: 1.8rem;}
-      .container {margin-top: 16px;}
-    }
+    @media(max-width:700px){ .slides img{height:320px} .thumbs img{width:90px;height:60px} .info{width:100%} .content{flex-direction:column} }
   </style>
 </head>
 <body>
   <div class="topbar"><a href="index.html">&#8592; Kembali ke Portofolio</a></div>
   <main class="container">
-    <h1>Blender 3D — Character, Environment, dan Modeling </h1>
-    <div class="meta">Tools: Blender • Substance Painter </div>
-
-    <div class="skill-progress" id="skillProgress">
-      <h3>Skill Progress</h3>
-      <div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-          <span style="color:#eaf0f6;">Blender Skill</span>
-          <span id="skillPercent" style="color:var(--accent);font-weight:700;">0%</span>
-        </div>
-        <div class="progress-container">
-          <div id="progressBar" class="progress-bar"></div>
-        </div>
-      </div>
-    </div>
+    <h1>Traditional Art — Ilustrasi Tradisional dan Painting</h1>
+    <div class="meta">Tools: Pencil, Brush, Canvas, Watercolor, Acrylic, Oil Paint</div>
 
     <div class="skill-progress" id="skillProgress" style="margin-bottom:18px;">
       <h3 style="color:var(--accent);margin:0 0 8px">Skill Progress</h3>
       <div style="background:#08121a;border-radius:8px;padding:8px;">
         <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-          <span style="color:#eaf0f6;">Blender Skill</span>
+          <span style="color:#eaf0f6;">Traditional Art Skill</span>
           <span id="skillPercent" style="color:var(--accent);font-weight:700;">0%</span>
         </div>
         <div style="background:#041018;border-radius:4px;height:12px;overflow:hidden;">
@@ -77,7 +52,6 @@
     </div>
 
     <div class="slider" id="slider">
-      <div class="slider-bg" id="sliderBg"></div>
       <div class="slides" id="slides">
         <!-- Karya yang di-upload akan muncul di sini -->
       </div>
@@ -92,33 +66,30 @@
     <div class="content">
       <div class="desc">
         <h2>Deskripsi Project</h2>
-        <p>Project ini adalah kombinasi environment sci-fi dan character stylized. Saya fokus pada blokout, sculpting, retopology, UV, texturing PBR, dan final render.</p>
-        <p>Langkah kerja: concept → blockout → sculpt → retopo → unwrap → texture → lighting → render.</p>
+        <p>Project traditional art ini mencakup berbagai teknik painting dan ilustrasi tradisional. Saya menggunakan media seperti cat air, akrilik, dan minyak untuk menciptakan karya seni yang ekspresif dan detail.</p>
+        <p>Langkah kerja: sketch → underdrawing → layering → detailing → finishing.</p>
         <a class="back" href="index.html">Kembali ke Portofolio</a>
       </div>
       <aside class="info">
         <h3 style="margin:0 0 8px">Detail Cepat</h3>
-        <p style="margin:6px 0;color:var(--muted)"><strong>Software:</strong> Blender dan Substance Painter</p>
-        <p style="margin:6px 0;color:var(--muted)"><strong>Peran:</strong> 3D Artist (modeling, texturing, lighting)</p>
+        <p style="margin:6px 0;color:var(--muted)"><strong>Media:</strong> Watercolor, Acrylic, Oil Paint</p>
+        <p style="margin:6px 0;color:var(--muted)"><strong>Peran:</strong> Traditional Artist (painting, illustration)</p>
         <p style="margin:6px 0;color:var(--muted)"><strong>Status:</strong> Selesai</p>
       </aside>
     </div>
   </main>
 
   <script>
-    // Simple slider logic
   (function(){
     // sesuaikan nama app sesuai value di upload.html dropdown
-    const APP_KEY = 'blender'; // <-- ganti 'blender' pada blender.html, 'zbrush' pada zbrush.html, dsb.
+    const APP_KEY = 'traditionalart';
 
     function getUploads(){ try{ return JSON.parse(localStorage.getItem('portfolio_uploads') || '[]') }catch(e){return []} }
     function saveUploads(arr){ localStorage.setItem('portfolio_uploads', JSON.stringify(arr)) }
     function getSkillSummary(){ try{ return JSON.parse(localStorage.getItem('skill_summary') || '{}') }catch(e){return {}} }
-    function saveSkillSummary(obj){ localStorage.setItem('skill_summary', JSON.stringify(obj)) }
 
-    let currentIndex = 0; // Tambahkan deklarasi currentIndex di sini
+    let currentIndex = 0;
 
-    // Helper function to animate number counting up (duplicated from index.html)
     function animateValue(obj, start, end, duration) {
       let startTimestamp = null;
       const step = (timestamp) => {
@@ -132,48 +103,35 @@
       };
       window.requestAnimationFrame(step);
     }
+
     const slidesEl = document.getElementById('slides');
     const thumbsContainer = document.getElementById('thumbs');
     const summary = getSkillSummary();
     const appSummary = summary[APP_KEY];
-
-    // Update skill badge/summary di halaman jika ada elemen dengan id #skillSummary
-    const skillBadge = document.getElementById('skillSummary'); // optional DOM element to show average
-    if(skillBadge && appSummary){
-      skillBadge.textContent = APP_KEY + ' Skill: ' + appSummary.average + '% (' + appSummary.count + ' proyek)';
-    }
 
     // Update progress bar
     const skillPercentEl = document.getElementById('skillPercent');
     const progressBarEl = document.getElementById('progressBar');
     const currentAvg = appSummary ? appSummary.average : 0;
     if(skillPercentEl && progressBarEl && appSummary){
-      progressBarEl.style.width = currentAvg + '%'; // CSS transition akan menangani animasi
-      animateValue(skillPercentEl, 0, currentAvg, 900); // Animasikan angka dari 0 ke rata-rata saat ini
+      progressBarEl.style.width = currentAvg + '%';
+      animateValue(skillPercentEl, 0, currentAvg, 900);
     }
 
-    // render each upload that matches APP_KEY
     const uploads = getUploads();
     const myUploads = uploads.filter(u=>u.app === APP_KEY);
-    
-    // --- New Unified Slider Logic ---
 
-    // 1. Get static items from the DOM
+    let galleryItems = [];
+
     const staticSlides = Array.from(slidesEl.querySelectorAll('img'));
     staticSlides.forEach((img, i) => {
       galleryItems.push({
-        id: `static_${i}`,
-        isStatic: true,
-        imageData: img.src,
-        description: img.alt,
-        app: APP_KEY
+        id: `static_${i}`, isStatic: true, imageData: img.src, description: img.alt, app: APP_KEY
       });
     });
 
-    // 2. Prepend dynamic uploads to the gallery items
     galleryItems = [...myUploads, ...galleryItems];
 
-    // 3. Render the unified gallery
     function renderGallery() {
       slidesEl.innerHTML = '';
       thumbsContainer.innerHTML = '';
@@ -184,13 +142,11 @@
       }
 
       galleryItems.forEach((item, i) => {
-        // Create slide element (img or video)
         const isVideo = item.imageData.startsWith('data:video');
         let slideEl;
         if (isVideo) {
           slideEl = document.createElement('video');
-          slideEl.controls = true;
-          slideEl.muted = true;
+          slideEl.controls = true; slideEl.muted = true;
           slideEl.style.cssText = 'width:100%; height:520px; object-fit:contain;';
         } else {
           slideEl = document.createElement('img');
@@ -199,18 +155,13 @@
         slideEl.alt = item.description || 'Karya';
         slidesEl.appendChild(slideEl);
 
-        // Create thumb element
         const thumbEl = document.createElement('img');
         thumbEl.src = isVideo ? 'https://via.placeholder.com/120x70.png?text=Video' : item.imageData;
         thumbEl.dataset.index = i;
         thumbEl.style.position = 'relative';
-        thumbEl.addEventListener('click', () => {
-          currentIndex = i;
-          updateSlider();
-        });
+        thumbEl.addEventListener('click', () => { currentIndex = i; updateSlider(); });
         thumbsContainer.appendChild(thumbEl);
 
-        // Add delete button for non-static items
         if (!item.isStatic) {
           const deleteBtn = document.createElement('button');
           deleteBtn.innerHTML = '&times;';
@@ -219,15 +170,10 @@
           deleteBtn.onclick = (e) => {
             e.stopPropagation();
             if (confirm('Anda yakin ingin menghapus karya ini?')) {
-              // Remove from localStorage
               const allUploads = getUploads();
               const newUploads = allUploads.filter(up => up.id !== item.id);
               saveUploads(newUploads);
-
-              // Remove from current gallery view
               galleryItems.splice(i, 1);
-              
-              // Re-render and update slider
               if (currentIndex >= galleryItems.length) {
                 currentIndex = Math.max(0, galleryItems.length - 1);
               }
@@ -249,21 +195,11 @@
         allThumbs[currentIndex].classList.add('active');
         allThumbs[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       }
-      // Update background
-      const currentItem = galleryItems[currentIndex];
-      const sliderBg = document.getElementById('sliderBg');
-      if (currentItem && !currentItem.imageData.startsWith('data:video')) {
-        sliderBg.style.backgroundImage = `url('${currentItem.imageData}')`;
-      } else {
-        sliderBg.style.backgroundImage = 'none'; // No background for videos
-      }
     }
 
-    // Initial render
     renderGallery();
     updateSlider();
 
-    // Navigation buttons
     document.getElementById('next').addEventListener('click', () => {
       if (galleryItems.length === 0) return;
       currentIndex = (currentIndex + 1) % galleryItems.length;
@@ -279,8 +215,6 @@
       if (e.key === 'ArrowLeft') document.getElementById('prev').click();
     });
   })();
-
-
   </script>
 </body>
 </html>

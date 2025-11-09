@@ -49,6 +49,11 @@
     .upload-card h1{color:#fff;margin:0 0 1rem;font-size:2rem}
     .upload-card p{color:var(--muted);margin:0 0 1.5rem;line-height:1.6}
 
+    /* Overlay for drag & drop */
+    #dragOverlay{position:fixed;inset:0;background:rgba(255,152,0,0.2);border:4px dashed var(--accent);z-index:9998;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .3s}
+    #dragOverlay.visible{opacity:1}
+    #dragOverlay h2{color:#fff;font-size:2rem;text-shadow:0 2px 10px rgba(0,0,0,0.5)}
+
     label{display:block;margin-top:1rem;font-weight:700;color:#fff}
     input[type=file], select, input[type=number], textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;font-family:var(--mono)}
     textarea{min-height:120px}
@@ -126,22 +131,27 @@
       <h1>Rangga Abi Yasha — 3D Artist</h1>
       <div class="nav-right">
         <div class="nav-links">
-          <a href="portfolio_enhanced.html">Home</a>
-          <a href="portfolio_enhanced.html#SkillAplikasi">Skills</a>
-          <a href="portfolio_enhanced.html#Portofoliodigital">Portfolio</a>
-          <a href="portfolio_enhanced.html#GalleryArt">Gallery</a>
+          <a href="index.html">Home</a>
+          <a href="index.html#SkillAplikasi">Skills</a>
+          <a href="index.html#Portofoliodigital">Portfolio</a>
+          <a href="index.html#GalleryArt">Gallery</a>
           <a href="upload.html" class="active">Upload</a>
-          <a href="portfolio_enhanced.html#Contact">Contact</a>
+          <a href="index.html#Contact">Contact</a>
         </div>
       </div>
     </nav>
   </header>
 
+  <div id="dragOverlay">
+    <h2>Letakkan file di mana saja untuk mengunggah</h2>
+  </div>
+
+
   <main class="container">
     <div class="upload-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
         <h1>Upload & Analisis Proyek</h1>
-        <a href="portfolio_enhanced.html" class="btn" style="padding:8px 16px;font-size:0.9rem">← Kembali ke Home</a>
+        <a href="index.html" class="btn" style="padding:8px 16px;font-size:0.9rem">← Kembali ke Home</a>
       </div>
       <p>Upload gambar hasil karya, isi deskripsi teknik yang digunakan, pilih aplikasi tujuan. Sistem akan menganalisis secara otomatis (AI sederhana + analisis gambar) dan kamu bisa beri skor manual. Hasil akhir adalah gabungan skor user & AI (50:50), lalu disimpan ke halaman aplikasi terkait.</p>
 
@@ -172,17 +182,21 @@
             <option value="illustrator">Illustrator</option>
             <option value="premiere">Premiere Pro</option>
             <option value="fotogrfi">Photography</option>
+            <option value="digitalart">Digital Art</option>
+        <option value="aftereffects">After Effects</option>
+        <option value="traditionalart">Traditional Art</option>
           </select>
         </div>
 
         <h3>2) Upload gambar hasil render</h3>
         <div class="form-group">
           <div class="drop-zone">
-            <input id="fileInput" type="file" accept="image/*" style="position:absolute;left:-9999px">
-            <label for="fileInput" style="display:block;padding:12px;border-radius:8px;border:2px dashed rgba(255,255,255,0.1);background:rgba(255,255,255,0.02);color:var(--muted);text-align:center;cursor:pointer;transition:background 0.2s">Klik untuk pilih gambar atau drag & drop di sini</label>
+            <input id="fileInput" type="file" accept="image/*,video/mp4" style="position:absolute;left:-9999px">
+            <label for="fileInput" style="display:block;padding:12px;border-radius:8px;border:2px dashed rgba(255,255,255,0.1);background:rgba(255,255,255,0.02);color:var(--muted);text-align:center;cursor:pointer;transition:background 0.2s">Klik untuk pilih gambar/video atau drag & drop di sini</label>
           </div>
           <div class="preview" id="previewWrap" style="display:none">
             <img id="previewImg" class="preview-img" src="" alt="preview">
+            <video id="previewVideo" class="preview-img" controls muted style="display:none;"></video>
           </div>
         </div>
 
@@ -289,6 +303,27 @@
         texturing: 'Editing',
         rendering: 'Post-Processing',
         deskripsi: 'Deskripsi Teknis'
+      },
+      digitalart: {
+        modeling: 'Concept',
+        lighting: 'Color',
+        texturing: 'Styling',
+        rendering: 'Export',
+        deskripsi: 'Deskripsi Teknis'
+      },
+      aftereffects: {
+        modeling: 'Animation',
+        lighting: 'Effects',
+        texturing: 'Compositing',
+        rendering: 'Export',
+        deskripsi: 'Deskripsi Teknis'
+      },
+      traditionalart: {
+        modeling: 'Composition',
+        lighting: 'Color',
+        texturing: 'Technique',
+        rendering: 'Finishing',
+        deskripsi: 'Deskripsi Teknis'
       }
     };
 
@@ -310,6 +345,7 @@
     const fileInput = document.getElementById('fileInput');
     const previewWrap = document.getElementById('previewWrap');
     const previewImg = document.getElementById('previewImg');
+    const previewVideo = document.getElementById('previewVideo');
     const descEl = document.getElementById('desc');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const aiResult = document.getElementById('aiResult');
@@ -320,18 +356,57 @@
     let currentImageData = null; // base64
     let lastAiScores = null;
     let lastAiText = '';
+    let editModeId = null;
+    const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
+    const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4'];
+
+    function showStatus(message, type = 'error') {
+      status.innerHTML = `<span class="small" style="color:${type === 'error' ? '#f99' : '#9f9'}">${message}</span>`;
+    }
+
+    function validateFile(file) {
+      if (!file) return false;
+      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+        showStatus(`Error: Tipe file tidak didukung. Hanya izinkan: ${ALLOWED_FILE_TYPES.join(', ')}`);
+        return false;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        showStatus(`Error: Ukuran file terlalu besar (Maks: ${MAX_FILE_SIZE / 1024 / 1024} MB).`);
+        return false;
+      }
+      return true;
+    }
+
 
     // image preview
     fileInput.addEventListener('change', (e)=>{
       const f = e.target.files[0];
       if(!f) return;
+
+      // Reset previews
+      if (!validateFile(f)) {
+        fileInput.value = ''; // Clear the invalid file
+        return;
+      }
+
+      previewImg.style.display = 'none';
+      previewVideo.style.display = 'none';
+      previewVideo.src = '';
+
       const reader = new FileReader();
       reader.onload = function(ev){
         currentImageData = ev.target.result;
-        previewImg.src = currentImageData;
+        if (f.type.startsWith('video/')) {
+          previewVideo.src = currentImageData;
+          previewVideo.style.display = 'block';
+        } else {
+          previewImg.src = currentImageData;
+          previewImg.style.display = 'block';
+        }
         previewWrap.style.display = 'block';
       }
       reader.readAsDataURL(f);
+      debouncedAutoAnalyze();
     });
 
     // simple AI text analyzer (keyword-based) - dynamic based on app
@@ -387,6 +462,20 @@
           texturing: ['composition','angle','focus','depth of field','sharpness','contrast','saturation','color balance','editing','retouch','dodge','burn'],
           rendering: ['resolution','jpeg','raw','tiff','export','print','web','compression','quality'],
           deskripsi: ['workflow','pipeline','step','technique','photography','camera','lens','lighting','editing','post-processing']
+        },
+        digitalart: {
+          modeling: ['concept','sketch','idea','design','layout','composition'],
+          lighting: ['color','palette','hue','saturation','brightness','contrast','tone','shade','highlight','shadow'],
+          texturing: ['styling','brush','layer','effect','filter','blend mode','texture','pattern','gradient','opacity'],
+          rendering: ['export','resolution','jpeg','png','tiff','quality','compression','save for web','artboard'],
+          deskripsi: ['workflow','pipeline','step','technique','digital art','illustration','concept art','design','styling']
+        },
+        aftereffects: {
+          modeling: ['animation','keyframe','motion','timeline','layer','composition','precomp','null object','shape layer'],
+          lighting: ['effects','visual effects','vfx','particle','glow','blur','shadow','light','flare','adjustment layer'],
+          texturing: ['compositing','mask','tracking','keying','green screen','rotoscoping','matte','alpha','blend mode'],
+          rendering: ['export','render','codec','resolution','frame rate','bitrate','quicktime','mp4','after effects','ae'],
+          deskripsi: ['workflow','pipeline','step','technique','after effects','motion graphics','visual effects','compositing','animation']
         }
       };
       const appKw = kw[app] || kw.blender; // fallback
@@ -417,9 +506,13 @@
 
     // simple image analyzer (basic metrics)
     async function analyzeImage(imgDataUrl){
-      if(!imgDataUrl) {
+      if (!imgDataUrl) {
         // fallback neutral scores
         return {modeling:6, lighting:6, texturing:6, rendering:6, text:'Tidak ada gambar ter-upload.'};
+      }
+      // If it's a video, skip analysis and return neutral scores
+      if (imgDataUrl.startsWith('data:video')) {
+        return {modeling:6, lighting:6, texturing:6, rendering:6, text:'Analisis gambar dilewati untuk file video.'};
       }
       return new Promise((resolve)=>{
         const img = new Image();
@@ -521,37 +614,19 @@
     // Initialize labels on load
     updateLabels(appSelect.value);
 
-    analyzeBtn.addEventListener('click', async ()=>{
-      aiResult.style.display='block';
-      aiResult.textContent = 'AI sedang menganalisis...';
-      const desc = descEl.value;
-      const app = appSelect.value;
-      const ai = await runAiAnalysis(desc, currentImageData, app);
-      lastAiScores = ai;
-      lastAiText = ai.textSummary;
-      const labels = APP_LABELS[app] || APP_LABELS.blender;
-      aiResult.innerHTML = `<strong>Hasil AI (skor 0–10):</strong>
-        <table>
-          <tr><th>Aspek</th><th>Skor AI</th></tr>
-          <tr><td>${labels.modeling}</td><td>${ai.modeling}</td></tr>
-          <tr><td>${labels.lighting}</td><td>${ai.lighting}</td></tr>
-          <tr><td>${labels.texturing}</td><td>${ai.texturing}</td></tr>
-          <tr><td>${labels.rendering}</td><td>${ai.rendering}</td></tr>
-          <tr><td>${labels.deskripsi}</td><td>${ai.deskripsi}</td></tr>
-        </table>
-        <p style="margin-top:8px"><strong>Ringkasan AI:</strong> ${ai.textSummary}</p>
-      `;
-    });
-
     // compute final and store
     finalizeBtn.addEventListener('click', async ()=>{
       if(!currentImageData){
-        status.innerHTML = '<span class="small" style="color:#f99">Silakan upload gambar terlebih dulu.</span>';
+        showStatus('Silakan upload gambar terlebih dulu.');
+        return;
+      }
+      if (descEl.value.trim().length < 10) {
+        showStatus('Deskripsi proyek terlalu pendek. Mohon jelaskan lebih detail.');
         return;
       }
       // ensure AI run
       if(!lastAiScores){
-        status.innerHTML = '<span class="small" style="color:#f99">Klik "Analisis AI" dulu sebelum finalize.</span>';
+        showStatus('Klik "Analisis AI" dulu sebelum finalize.');
         return;
       }
       // collect user scores
@@ -575,7 +650,12 @@
         const weight = ASPECT_WEIGHTS[k] || 0;
         total += (finalScores[k] * (weight/100)) * 10; // because finalScores in 0-10 -> *10 to get percent
       }
-      const totalPercent = Number(total.toFixed(2)); // 0-100
+      // Bug Fix: Ensure totalPercent is a valid number before saving
+      let totalPercent = Number(total.toFixed(2)); // 0-100
+      if (isNaN(totalPercent)) {
+        console.error("Calculation error: totalPercent is NaN. Defaulting to 0.", { userScores, lastAiScores, finalScores });
+        totalPercent = 0;
+      }
 
       // build upload object
       const obj = {
@@ -591,37 +671,57 @@
         timestamp: new Date().toISOString()
       };
 
-      // store in uploads
+      // store in uploads (check for edit mode)
       const uploads = getUploads();
-      uploads.unshift(obj); // add newest front
+      if (editModeId) {
+        const index = uploads.findIndex(u => u.id === editModeId);
+        if (index !== -1) {
+          // Preserve original ID and timestamp when editing
+          uploads[index] = { ...obj, id: editModeId, timestamp: uploads[index].timestamp };
+        } else {
+          uploads.unshift(obj); // Fallback: add as new if ID not found
+        }
+      } else {
+        uploads.unshift(obj); // add newest front
+      }
       saveUploads(uploads);
 
-      // update skill summary: we maintain average (simple incremental average)
-      const summary = getSkillSummary();
-      const cur = summary[obj.app] || {average:0, count:0};
-      const newCount = cur.count + 1;
-      const newAvg = ((cur.average * cur.count) + totalPercent) / newCount;
-      summary[obj.app] = {average: Number(newAvg.toFixed(2)), count: newCount};
-      saveSkillSummary(summary);
-
-      status.innerHTML = `<span class="success">Berhasil di-upload ke "${obj.app}.html" — Skill ${obj.app} sekarang ${summary[obj.app].average}% (dari ${summary[obj.app].count} proyek)</span>`;
+      // Hapus perhitungan summary dari sini. Biarkan index.html yang menghitung.
+      status.innerHTML = `<span class="success">${editModeId ? 'Berhasil diperbarui!' : 'Berhasil di-upload!'} Persentase skill akan diperbarui di halaman utama.</span>`;
 
       // reset-ish
       lastAiScores = null;
       lastAiText = '';
       // redirect to target page
       setTimeout(()=>{
-        const target = obj.app + '.html';
+        // Redirect ke halaman utama untuk melihat pembaruan skill
+        const target = `index.html#karya=${editModeId || obj.id}`;
         window.location.href = target;
       },800);
     });
+
+    // Bug Fix: Reset AI analysis if description or file changes
+    function resetAiAnalysisState() {
+      if (lastAiScores) {
+        lastAiScores = null;
+        lastAiText = '';
+        aiResult.style.display = 'block';
+        aiResult.innerHTML = '<span style="color:#f99">Deskripsi atau file berubah. Mohon klik "Analisis AI" lagi.</span>';
+        analyzeBtn.disabled = false;
+        analyzeBtn.innerHTML = 'Analisis AI';
+      }
+    }
+
+    descEl.addEventListener('input', debouncedAutoAnalyze);
+    fileInput.addEventListener('change', resetAiAnalysisState);
+    appSelect.addEventListener('change', resetAiAnalysisState);
 
     // login functionality
     loginBtn.addEventListener('click', ()=>{
       const username = usernameEl.value.trim();
       const password = passwordEl.value.trim();
-      // simple check: any non-empty username and password for demo
-      if(username && password){
+      // Pengecekan kredensial langsung (seperti semula)
+      if(username === "MELABAR157" && password === "06-10-08"){
         loginSection.style.opacity = '0';
         setTimeout(() => {
           loginSection.style.display = 'none';
@@ -630,6 +730,7 @@
         }, 500);
         loginError.style.display = 'none';
       } else {
+        loginError.textContent = 'sandi anda salah';
         loginError.style.display = 'block';
         loginError.classList.add('message');
       }
@@ -637,6 +738,7 @@
 
     // drag and drop functionality
     const dropZone = document.querySelector('.drop-zone');
+    const dragOverlay = document.getElementById('dragOverlay');
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
       dropZone.classList.add('dragover');
@@ -649,10 +751,26 @@
       dropZone.classList.remove('dragover');
       const files = e.dataTransfer.files;
       if (files.length > 0) {
-        fileInput.files = files;
-        fileInput.dispatchEvent(new Event('change'));
+        if (validateFile(files[0])) {
+          fileInput.files = files;
+          fileInput.dispatchEvent(new Event('change'));
+        }
       }
     });
+    // Global drag-drop overlay
+    window.addEventListener('dragenter', (e) => {
+      dragOverlay.classList.add('visible');
+    });
+    // Use a counter to deal with child elements firing dragleave
+    let dragCounter = 0;
+    window.addEventListener('dragenter', () => dragCounter++);
+    window.addEventListener('dragleave', () => {
+      dragCounter--;
+      if (dragCounter === 0) {
+        dragOverlay.classList.remove('visible');
+      }
+    });
+    window.addEventListener('drop', () => { dragCounter = 0; dragOverlay.classList.remove('visible'); });
 
     // loading spinner for AI analysis
     analyzeBtn.addEventListener('click', async ()=>{
@@ -663,6 +781,7 @@
       const desc = descEl.value;
       const app = appSelect.value;
       const ai = await runAiAnalysis(desc, currentImageData, app);
+      analyzeBtn.disabled = false; analyzeBtn.innerHTML = 'Analisis AI';
       lastAiScores = ai;
       lastAiText = ai.textSummary;
       const labels = APP_LABELS[app] || APP_LABELS.blender;
@@ -680,6 +799,20 @@
       analyzeBtn.disabled = false;
       analyzeBtn.innerHTML = 'Analisis AI';
     });
+
+    // Debounce function for auto-analysis
+    let debounceTimeout;
+    function debouncedAutoAnalyze() {
+      resetAiAnalysisState();
+      clearTimeout(debounceTimeout);
+      if (currentImageData && descEl.value.trim().length > 10) {
+        debounceTimeout = setTimeout(() => {
+          if (currentImageData && descEl.value.trim().length > 10) { // Double check
+            analyzeBtn.click();
+          }
+        }, 1500); // Wait 1.5s after user stops typing
+      }
+    }
 
     // tooltips for inputs
     const inputs = document.querySelectorAll('input, textarea');
@@ -700,8 +833,38 @@
     observer.observe(statusEl, { childList: true });
 
     // load existing for debugging
-    (function init(){
-      // nothing for now
+    (function init() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const workIdToEdit = urlParams.get('edit');
+      if (workIdToEdit) {
+        const uploads = getUploads();
+        const workToEdit = uploads.find(u => u.id === workIdToEdit);
+        if (workToEdit) {
+          editModeId = workIdToEdit;
+          // Populate form with existing data
+          document.querySelector('h1').textContent = 'Edit Proyek';
+          appSelect.value = workToEdit.app;
+          descEl.value = workToEdit.description;
+          currentImageData = workToEdit.imageData;
+          if (currentImageData.startsWith('data:video')) {
+            previewVideo.src = currentImageData;
+            previewVideo.style.display = 'block';
+          } else {
+            previewImg.src = currentImageData;
+            previewImg.style.display = 'block';
+          }
+          previewWrap.style.display = 'block';
+          // Populate manual scores
+          if (workToEdit.userScores) {
+            for (const key in workToEdit.userScores) {
+              const input = document.getElementById(`u_${key}`);
+              if (input) input.value = workToEdit.userScores[key];
+            }
+          }
+          finalizeBtn.textContent = 'Update Karya';
+          updateLabels(workToEdit.app); // Update labels for the correct app
+        }
+      }
     })();
   </script>
 </body>
