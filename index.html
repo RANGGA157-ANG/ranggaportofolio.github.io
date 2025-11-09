@@ -376,6 +376,26 @@
           </div>
           <a href="aftereffects.html" class="btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;">Lihat Karya</a>
         </div>
+
+        <div class="skill-card">
+          <h3>Digital Art</h3>
+          <p>Digital painting, illustration & concept art.</p>
+          <div class="skill-row">
+            <div class="progress"><div id="digitalart-bar" class="progress-bar" data-value="0%"></div></div>
+            <div style="width:48px;text-align:right;font-weight:800;color:var(--accent)" id="digitalart-percent">0%</div>
+          </div>
+          <a href="digitalart.html" class="btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;">Lihat Karya</a>
+        </div>
+
+        <div class="skill-card">
+          <h3>Traditional Art</h3>
+          <p>Sketching, painting & mixed media techniques.</p>
+          <div class="skill-row">
+            <div class="progress"><div id="traditionalart-bar" class="progress-bar" data-value="0%"></div></div>
+            <div style="width:48px;text-align:right;font-weight:800;color:var(--accent)" id="traditionalart-percent">0%</div>
+          </div>
+          <a href="traditionalart.html" class="btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;">Lihat Karya</a>
+        </div>
       </div>
     </section>
 
@@ -396,8 +416,10 @@
           <option value="substance">Substance Painter</option>
           <option value="photoshop">Photoshop</option>
           <option value="illustrator">Illustrator</option>
-          <option value="premierpro">Premiere Pro</option>
+          <option value="premiere">Premiere Pro</option>
           <option value="fotogrfi">Photography</option>
+          <option value="digitalart">Digital Art</option>
+          <option value="traditionalart">Traditional Art</option>
         </select>
       </div>
 
@@ -607,7 +629,7 @@
 
   <script>
     /* ---------- Configuration ---------- */
-    const APPS = ['blender','zbrush','substance','photoshop','premiere','fotogrfi'];
+    const APPS = ['blender','zbrush','substance','photoshop','premiere','fotogrfi','digitalart','traditionalart'];
     const ASPECT_WEIGHTS = { modeling:30, lighting:15, texturing:25, rendering:15, deskripsi:15 };
 
     /* ---------- Helpers ---------- */
