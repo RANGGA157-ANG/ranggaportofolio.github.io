@@ -404,6 +404,7 @@ finalizeBtn.addEventListener('click', async ()=>{
     return;
   }
   for (const key in lastAiScores) {
+    if (key === 'textSummary') continue; // Skip non-numeric fields
     if (isNaN(lastAiScores[key]) || lastAiScores[key] < 0 || lastAiScores[key] > 10) {
       console.error(`AI score for ${key} is invalid: ${lastAiScores[key]}`);
       showStatus('Error: Analisis AI gagal, coba lagi.');
