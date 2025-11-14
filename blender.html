@@ -63,19 +63,6 @@
       </div>
     </div>
 
-    <div class="skill-progress" id="skillProgress" style="margin-bottom:18px;">
-      <h3 style="color:var(--accent);margin:0 0 8px">Skill Progress</h3>
-      <div style="background:#08121a;border-radius:8px;padding:8px;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-          <span style="color:#eaf0f6;">Blender Skill</span>
-          <span id="skillPercent" style="color:var(--accent);font-weight:700;">0%</span>
-        </div>
-        <div style="background:#041018;border-radius:4px;height:12px;overflow:hidden;">
-          <div id="progressBar" style="background:linear-gradient(90deg,var(--accent),#ffb74d);height:100%;width:0%;transition:width 1s ease;"></div>
-        </div>
-      </div>
-    </div>
-
     <div class="slider" id="slider">
       <div class="slider-bg" id="sliderBg"></div>
       <div class="slides" id="slides">
@@ -105,182 +92,15 @@
     </div>
   </main>
 
+  <!-- Memuat skrip terpusat -->
+  <script src="global.js"></script>
+  <script src="gallery-loader.js"></script>
   <script>
-    // Simple slider logic
-  (function(){
-    // sesuaikan nama app sesuai value di upload.html dropdown
-    const APP_KEY = 'blender'; // <-- ganti 'blender' pada blender.html, 'zbrush' pada zbrush.html, dsb.
-
-    function getUploads(){ try{ return JSON.parse(localStorage.getItem('portfolio_uploads') || '[]') }catch(e){return []} }
-    function saveUploads(arr){ localStorage.setItem('portfolio_uploads', JSON.stringify(arr)) }
-    function getSkillSummary(){ try{ return JSON.parse(localStorage.getItem('skill_summary') || '{}') }catch(e){return {}} }
-    function saveSkillSummary(obj){ localStorage.setItem('skill_summary', JSON.stringify(obj)) }
-
-    let currentIndex = 0; // Tambahkan deklarasi currentIndex di sini
-
-    // Helper function to animate number counting up (duplicated from index.html)
-    function animateValue(obj, start, end, duration) {
-      let startTimestamp = null;
-      const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        const currentValue = Math.floor(progress * (end - start) + start);
-        obj.innerHTML = currentValue + '%';
-        if (progress < 1) {
-          window.requestAnimationFrame(step);
-        }
-      };
-      window.requestAnimationFrame(step);
-    }
-    const slidesEl = document.getElementById('slides');
-    const thumbsContainer = document.getElementById('thumbs');
-    const summary = getSkillSummary();
-    const appSummary = summary[APP_KEY];
-
-    // Update skill badge/summary di halaman jika ada elemen dengan id #skillSummary
-    const skillBadge = document.getElementById('skillSummary'); // optional DOM element to show average
-    if(skillBadge && appSummary){
-      skillBadge.textContent = APP_KEY + ' Skill: ' + appSummary.average + '% (' + appSummary.count + ' proyek)';
-    }
-
-    // Update progress bar
-    const skillPercentEl = document.getElementById('skillPercent');
-    const progressBarEl = document.getElementById('progressBar');
-    const currentAvg = appSummary ? appSummary.average : 0;
-    if(skillPercentEl && progressBarEl && appSummary){
-      progressBarEl.style.width = currentAvg + '%'; // CSS transition akan menangani animasi
-      animateValue(skillPercentEl, 0, currentAvg, 900); // Animasikan angka dari 0 ke rata-rata saat ini
-    }
-
-    // render each upload that matches APP_KEY
-    const uploads = getUploads();
-    const myUploads = uploads.filter(u=>u.app === APP_KEY);
-    
-    // --- New Unified Slider Logic ---
-
-    // 1. Get static items from the DOM
-    const staticSlides = Array.from(slidesEl.querySelectorAll('img'));
-    staticSlides.forEach((img, i) => {
-      galleryItems.push({
-        id: `static_${i}`,
-        isStatic: true,
-        imageData: img.src,
-        description: img.alt,
-        app: APP_KEY
-      });
+    // Inisialisasi galeri untuk halaman ini
+    document.addEventListener('DOMContentLoaded', () => {
+      // Cukup panggil fungsi initGallery dengan APP_KEY yang sesuai
+      initGallery('blender'); 
     });
-
-    // 2. Prepend dynamic uploads to the gallery items
-    galleryItems = [...myUploads, ...galleryItems];
-
-    // 3. Render the unified gallery
-    function renderGallery() {
-      slidesEl.innerHTML = '';
-      thumbsContainer.innerHTML = '';
-
-      if (galleryItems.length === 0) {
-        slidesEl.innerHTML = '<p style="text-align:center; padding: 2rem; color: var(--muted);">Belum ada karya yang diunggah untuk kategori ini.</p>';
-        return;
-      }
-
-      galleryItems.forEach((item, i) => {
-        // Create slide element (img or video)
-        const isVideo = item.imageData.startsWith('data:video');
-        let slideEl;
-        if (isVideo) {
-          slideEl = document.createElement('video');
-          slideEl.controls = true;
-          slideEl.muted = true;
-          slideEl.style.cssText = 'width:100%; height:520px; object-fit:contain;';
-        } else {
-          slideEl = document.createElement('img');
-        }
-        slideEl.src = item.imageData;
-        slideEl.alt = item.description || 'Karya';
-        slidesEl.appendChild(slideEl);
-
-        // Create thumb element
-        const thumbEl = document.createElement('img');
-        thumbEl.src = isVideo ? 'https://via.placeholder.com/120x70.png?text=Video' : item.imageData;
-        thumbEl.dataset.index = i;
-        thumbEl.style.position = 'relative';
-        thumbEl.addEventListener('click', () => {
-          currentIndex = i;
-          updateSlider();
-        });
-        thumbsContainer.appendChild(thumbEl);
-
-        // Add delete button for non-static items
-        if (!item.isStatic) {
-          const deleteBtn = document.createElement('button');
-          deleteBtn.innerHTML = '&times;';
-          deleteBtn.title = 'Hapus karya ini';
-          deleteBtn.style.cssText = 'position:absolute; top:-5px; right:-5px; background:#f44336; color:white; border:none; border-radius:50%; width:20px; height:20px; cursor:pointer; z-index:10;';
-          deleteBtn.onclick = (e) => {
-            e.stopPropagation();
-            if (confirm('Anda yakin ingin menghapus karya ini?')) {
-              // Remove from localStorage
-              const allUploads = getUploads();
-              const newUploads = allUploads.filter(up => up.id !== item.id);
-              saveUploads(newUploads);
-
-              // Remove from current gallery view
-              galleryItems.splice(i, 1);
-              
-              // Re-render and update slider
-              if (currentIndex >= galleryItems.length) {
-                currentIndex = Math.max(0, galleryItems.length - 1);
-              }
-              renderGallery();
-              updateSlider();
-            }
-          };
-          thumbEl.appendChild(deleteBtn);
-        }
-      });
-    }
-
-    function updateSlider() {
-      if (galleryItems.length === 0) return;
-      slidesEl.style.transform = `translateX(-${currentIndex * 100}%)`;
-      const allThumbs = thumbsContainer.querySelectorAll('img');
-      allThumbs.forEach(t => t.classList.remove('active'));
-      if (allThumbs[currentIndex]) {
-        allThumbs[currentIndex].classList.add('active');
-        allThumbs[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      }
-      // Update background
-      const currentItem = galleryItems[currentIndex];
-      const sliderBg = document.getElementById('sliderBg');
-      if (currentItem && !currentItem.imageData.startsWith('data:video')) {
-        sliderBg.style.backgroundImage = `url('${currentItem.imageData}')`;
-      } else {
-        sliderBg.style.backgroundImage = 'none'; // No background for videos
-      }
-    }
-
-    // Initial render
-    renderGallery();
-    updateSlider();
-
-    // Navigation buttons
-    document.getElementById('next').addEventListener('click', () => {
-      if (galleryItems.length === 0) return;
-      currentIndex = (currentIndex + 1) % galleryItems.length;
-      updateSlider();
-    });
-    document.getElementById('prev').addEventListener('click', () => {
-      if (galleryItems.length === 0) return;
-      currentIndex = (currentIndex - 1 + galleryItems.length) % galleryItems.length;
-      updateSlider();
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') document.getElementById('next').click();
-      if (e.key === 'ArrowLeft') document.getElementById('prev').click();
-    });
-  })();
-
-
   </script>
 </body>
 </html>

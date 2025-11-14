@@ -124,23 +124,24 @@
         animateValue(skillPercentEl, 0, currentAvg, 900); // Animasikan angka dari 0 ke rata-rata saat ini
       }
 
-      // render each upload that matches APP_KEY
-      const uploads = getUploads();
-      const myUploads = uploads.filter(u=>u.app === APP_KEY);
+    // render each upload that matches APP_KEY
+    const uploads = getUploads();
+    const myUploads = uploads.filter(u=>u.app === APP_KEY);
 
-      // --- New Unified Slider Logic ---
+    // --- New Unified Slider Logic ---
+    let galleryItems = [];
 
-      // 1. Get static items from the DOM
-      const staticSlides = Array.from(slidesEl.querySelectorAll('img'));
-      staticSlides.forEach((img, i) => {
-        galleryItems.push({
-          id: `static_${i}`,
-          isStatic: true,
-          imageData: img.src,
-          description: img.alt,
-          app: APP_KEY
-        });
+    // 1. Get static items from the DOM
+    const staticSlides = Array.from(slidesEl.querySelectorAll('img'));
+    staticSlides.forEach((img, i) => {
+      galleryItems.push({
+        id: `static_${i}`,
+        isStatic: true,
+        imageData: img.src,
+        description: img.alt,
+        app: APP_KEY
       });
+    });
 
       // 2. Prepend dynamic uploads to the gallery items
       galleryItems = [...myUploads, ...galleryItems];

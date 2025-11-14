@@ -9,7 +9,7 @@
   <!-- Font: Space Mono -->
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9cZ9gz6fBwQffrwLkzCmO8cFTV0E8iBvOJvsg5d94pjYjbc0hlZbTV7R3Xy1QCMSaBhPgzofNYZhC+JGg5Og==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
   <style>
     :root{
@@ -459,7 +459,7 @@
 
       <div class="portfolio-grid" id="portfolioGrid">
         <!-- static examples (ke-3 awal) -->
-        <div class="card">
+        <div class="card" data-app="blender">
           <img src="IMAGES/blander1.jpeg" alt="3D Environment Sci-fi" loading="lazy" onerror="this.src='IMAGES/placeholder.jpg'">
           <div class="card-content">
             <h3>3D Environment Design</h3>
@@ -467,7 +467,7 @@
           </div>
         </div>
 
-        <div class="card">
+        <div class="card" data-app="blender">
           <img src="IMAGES/blander2.jpeg" alt="Digital Poster Design" loading="lazy" onerror="this.src='IMAGES/placeholder.jpg'">
           <div class="card-content">
             <h3>3d label_modeling</h3>
@@ -475,7 +475,7 @@
           </div>
         </div>
 
-        <div class="card">
+        <div class="card" data-app="blender">
           <img src="IMAGES/blander3.jpeg" alt="3D Character Concept" loading="lazy" onerror="this.src='IMAGES/placeholder.jpg'">
           <div class="card-content">
             <h3>3D Character Concept</h3>
@@ -543,6 +543,7 @@
           <textarea id="contactMessage" required rows="5" style="width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf3fb;font-family:inherit;resize:vertical" placeholder="Tulis pesan Anda di sini..."></textarea>
         </div>
 
+        <div id="contactError" style="color:#ff6b6b;margin-top:1rem;display:none;animation:fadeIn 0.5s;">Mohon lengkapi semua field yang wajib diisi.</div>
         <button type="submit" class="btn" style="width:100%;padding:14px;font-size:1rem">Kirim ke WhatsApp</button>
       </form>
 
@@ -638,10 +639,29 @@
       displayItems.forEach(u=>{
         // create card
         const card = document.createElement('div'); card.className = 'card';
+        card.setAttribute('data-app', u.app);
+        const img = document.createElement('img');
+        img.src = u.imageData || 'IMAGES/placeholder.jpg';
+        img.alt = u.description || '';
+        img.loading = 'lazy';
+        img.onerror = function(){ this.src='IMAGES/placeholder.jpg'; };
+        card.appendChild(img);
         const cardContent = document.createElement('div'); cardContent.className = 'card-content';
-        const img = document.createElement('img'); vieid = 'viewAllBtn';=  viewAllBtn.innerHTML = '<a h.html" class="btn" style="display:inline-block;">Lihat Selengkapnya</a>';
-        grid.parentNode.insertBefore(viewAllBtn, grid.nextSibling);
-      }
+        const h3 = document.createElement('h3');
+        h3.textContent = u.app ? u.app.toUpperCase() + ' — ' + (u.description || '') : (u.description || '');
+        const p = document.createElement('p');
+        p.textContent = 'Uploaded: ' + new Date(u.timestamp || Date.now()).toLocaleString();
+        cardContent.appendChild(h3);
+        cardContent.appendChild(p);
+        card.appendChild(cardContent);
+        card.addEventListener('click', () => openModal(u));
+        grid.appendChild(card);
+      });
+      // Add "View All" button
+      const viewAllBtn = document.createElement('div');
+      viewAllBtn.id = 'viewAllBtn';
+      viewAllBtn.innerHTML = '<a href="all-gallery.html" class="btn" style="display:inline-block;">Lihat Selengkapnya</a>';
+      grid.parentNode.insertBefore(viewAllBtn, grid.nextSibling);
 
       // --- Populate Gallery Art section (Top 10 Digital/Traditional Art) ---
       const artGrid = document.querySelector('#GalleryArt .art-grid');
@@ -661,48 +681,58 @@
               img.src = u.imageData || 'IMAGES/placeholder.jpg';
               img.alt = u.description || '';
               img.loading = 'lazy';
-              img = "this.src='IMAGES/placeholder.jpg'";t
+              img.onerror = function(){ this.src='IMAGES/placeholder.jpg'; };
+              artItem.appendChild(img);
               artItem.addEventListener('click', () => openLightbox(img.src, img.alt));
               artGrid.appendChild(artItem);
           });
       }
 
-      // --- Poputo Gallery section (Top 10 Photography) ---oelector('.photo-gallery .photo-grid');
+      // --- Photo Gallery section (Top 10 Photography) ---
+      const photoGrid = document.querySelector('.photo-gallery .photo-grid');
       if (photoGrid) {
         photoGrid.innerHTML = ''; // Clear static content
-        const phoUploads = uploads.filter(u => u.app === 'fotp (b.totalPercent || 0) - (a.totalPercent || 0));
+        const photographyUploads = uploads.filter(u => u.app === 'fotogrfi');
+        photographyUploads.sort((a,b)=> (b.totalPercent || 0) - (a.totalPercent || 0));
         const top10Photos = photographyUploads.slice(0, 10);
 
-        if (top10ength === 0) {rle="text-align:center; padding: 2rem; color: var(--muted);">Belum ada karya Fotografi yang diunggah.</p>';
+        if (top10Photos.length === 0) {
+          photoGrid.innerHTML = '<p style="text-align:center; padding: 2rem; color: var(--muted);">Belum ada karya Fotografi yang diunggah.</p>';
         } else {
           top10Photos.forEach(u => {
-              conItem = document.createElement('div');ooto-item';
-              const img = document.createElement('img');
-              img.src = u.imageData || 'IMAGES/placeholder.jpg';
-              img.alt = u.description || '';
-              img.loading = 'lazy';
-              img.onerror = "this.src='IMAGES/placeholder.jpg'";
-              photmendChild(img); or consistency with previous static items
-              const overlay = document.createElement('div');
-              overlay.className = 'photo-overlay';
-              const h4 = document.createElement('h4');
-              h4.tot = u.description ? u.description.split(' nnlement('p');
-              p.textContent = (u.description || '').slice(0, 50) + ((u.description && u.description.length > 50) ? '...' : '');
-              overlay.appendChild(h4);
-              overlay.appendChild(p);
-              photmendChild(overlay);
-              photoItem.addEventListener('click', () => openLightbox(img.src, img.alt));
-              photoGrid.appendChild(photoItem);
+            const photoItem = document.createElement('div');
+            photoItem.className = 'photo-item';
+            const img = document.createElement('img');
+            img.src = u.imageData || 'IMAGES/placeholder.jpg';
+            img.alt = u.description || '';
+            img.loading = 'lazy';
+            img.onerror = function(){ this.src='IMAGES/placeholder.jpg'; };
+            photoItem.appendChild(img);
+            // for consistency with previous static items
+            const overlay = document.createElement('div');
+            overlay.className = 'photo-overlay';
+            const h4 = document.createElement('h4');
+            h4.textContent = u.description ? u.description.split(' ')[0] : '';
+            const p = document.createElement('p');
+            p.textContent = (u.description || '').slice(0, 50) + ((u.description && u.description.length > 50) ? '...' : '');
+            overlay.appendChild(h4);
+            overlay.appendChild(p);
+            photoItem.appendChild(overlay);
+            photoItem.addEventListener('click', () => openLightbox(img.src, img.alt));
+            photoGrid.appendChild(photoItem);
           });
         }
+      }
 
       // Helper function to animate number counting up
       function animateValue(obj, start, end, duration) {
-        let startTt= null;ep
+        let startTimestamp = null;
+        const step = (timestamp) => {
           if (!startTimestamp) startTimestamp = timestamp;
           const progress = Math.min((timestamp - startTimestamp) / duration, 1);
           const currentValue = Math.floor(progress * (end - start) + start);
-          obj.inneLurrentValue + '%';o
+          obj.innerHTML = currentValue + '%';
+          if (progress < 1) {
             window.requestAnimationFrame(step);
           }
         };
@@ -869,8 +899,7 @@
             filterCards(); // reapply filter
           }, 500);
         } else {
-          document.getElementById('deleteError').style.display = 
-        // Pengecekan kode hapus langsung'block';
+          document.getElementById('deleteError').style.display = 'block';
           document.getElementById('deleteCode').classList.add('shake');
           setTimeout(() => {
             document.getElementById('deleteCode').classList.remove('shake');
@@ -904,8 +933,9 @@
       const type = document.getElementById('contactType').value;
       const message = document.getElementById('contactMessage').value.trim();
 
+      document.getElementById('contactError').style.display = 'none';
       if (!name || !type || !message) {
-        alert('Mohon lengkapi semua field yang wajib diisi.');
+        document.getElementById('contactError').style.display = 'block';
         return;
       }
 
@@ -957,6 +987,13 @@
             openModal(workToShow);
           }, 300); // Small delay to ensure UI is ready
         }
+      }
+    });
+
+    // Listen for localStorage changes from other tabs/windows to update UI in real-time
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'portfolio_uploads') {
+        loadUploads();
       }
     });
 
