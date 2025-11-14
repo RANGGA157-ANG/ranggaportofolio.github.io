@@ -466,15 +466,9 @@ finalizeBtn.addEventListener('click', async ()=>{
   // reset-ish
   lastAiScores = null;
   lastAiText = '';
-  // redirect to target page based on app
+  // redirect to index.html Portofoliodigital section
   setTimeout(()=>{
-    // Redirect ke halaman aplikasi terkait untuk melihat karya
-    let appPage = obj.app;
-    if (appPage === 'digitalart') appPage = 'Digital Art';
-    else if (appPage === 'aftereffects') appPage = 'aftereffects';
-    else if (appPage === 'traditionalart') appPage = 'Traditional Art';
-    else appPage = obj.app; // blender, zbrush, etc.
-    const target = `${appPage}.html#karya=${editModeId || obj.id}`;
+    const target = `index.html#Portofoliodigital`;
     console.log('Redirecting to:', target); // Debug log
     window.location.href = target;
   },800);
