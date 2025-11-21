@@ -488,6 +488,8 @@
 
       <div style="text-align:center;margin-top:2rem">
         <a href="upload.html" class="btn">Upload Karya Baru & Analisis AI</a>
+        <br><br>
+        <a href="all-gallery.html" class="btn" style="background: rgba(255,255,255,0.1); color: var(--accent); box-shadow: none;">Lihat Semua Galeri</a>
       </div>
     </section>
 
@@ -591,7 +593,11 @@
     <img id="lightboxImg" src="" alt="lightbox">
   </div>
 
-  <script>
+  <script type="module">
+    // Import Firebase functions
+    import { getUploads, deleteUploadFromFirebase, saveContactToFirebase } from "./firebase-uploads.js";
+    import { animateValue } from "./ui-animation.js";
+
     /* ---------- Configuration ---------- */
     const APPS = ['blender','zbrush','substance','photoshop','premiere','fotogrfi','aftereffects','digitalart','traditionalart'];
     const ASPECT_WEIGHTS = { modeling:30, lighting:15, texturing:25, rendering:15, deskripsi:15 };
@@ -601,155 +607,164 @@
     function saveJSON(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
 
     // Unified and authoritative skill summary calculation
-    function getSkillSummary(){
-      const uploads = getJSON('portfolio_uploads', []);
-      const summary = {};
-      APPS.forEach(app=>{
-        const appUploads = uploads.filter(u=>u.app === app);
-        if(appUploads.length > 0){
-          const totalPercent = appUploads.reduce((sum, u)=> sum + (u.totalPercent || 0), 0);
-          summary[app] = { 
-            average: Math.round(totalPercent / appUploads.length),
-            count: appUploads.length
-          };
-        } else {
-          summary[app] = { average: 0, count: 0 };
-        }
-      });
-      return summary;
+    async function getSkillSummary(){
+      try {
+        const uploads = await getUploads();
+        const summary = {};
+        APPS.forEach(app=>{
+          const appUploads = uploads.filter(u=>u.app === app);
+          if(appUploads.length > 0){
+            const totalPercent = appUploads.reduce((sum, u)=> sum + (u.totalPercent || 0), 0);
+            summary[app] = {
+              average: Math.round(totalPercent / appUploads.length),
+              count: appUploads.length
+            };
+          } else {
+            summary[app] = { average: 0, count: 0 };
+          }
+        });
+        return summary;
+      } catch (error) {
+        console.error("Error calculating skill summary:", error);
+        return {};
+      }
     }
 
-
-
     /* ---------- Load uploads and update UI ---------- */
-    function loadUploads(){
-      const uploads = getJSON('portfolio_uploads', []);
+    async function loadUploads(){
+      try {
+        const uploads = await getUploads();
 
-      // sort by totalPercent desc (highest skill first)
-      uploads.sort((a,b)=> (b.totalPercent || 0) - (a.totalPercent || 0));
+        // sort by totalPercent desc (highest skill first)
+        uploads.sort((a,b)=> (b.totalPercent || 0) - (a.totalPercent || 0));
 
-      const grid = document.getElementById('portfolioGrid');
-      const summary = getSkillSummary(); // Calculate skill summary
-      // remove dynamic children (keep first 3 static)
-      while(grid.children.length > 3) grid.removeChild(grid.lastChild);
+        const grid = document.getElementById('portfolioGrid');
+        const summary = await getSkillSummary(); // Calculate skill summary
+        // remove dynamic children (keep first 3 static)
+        while(grid.children.length > 3) grid.removeChild(grid.lastChild);
 
-      // limit to top 10 for homepage
-      const displayItems = uploads.slice(0, 10);
+        // limit to top 10 for homepage, all apps
+        const displayItems = uploads.slice(0, 10);
 
-      displayItems.forEach(u=>{
-        // create card
-        const card = document.createElement('div'); card.className = 'card';
-        card.setAttribute('data-app', u.app);
-        const img = document.createElement('img');
-        img.src = u.imageData || 'IMAGES/placeholder.jpg';
-        img.alt = u.description || '';
-        img.loading = 'lazy';
-        img.onerror = function(){ this.src='IMAGES/placeholder.jpg'; };
-        card.appendChild(img);
-        const cardContent = document.createElement('div'); cardContent.className = 'card-content';
-        const h3 = document.createElement('h3');
-        h3.textContent = u.app ? u.app.toUpperCase() + ' — ' + (u.description || '') : (u.description || '');
-        const p = document.createElement('p');
-        p.textContent = 'Uploaded: ' + new Date(u.timestamp || Date.now()).toLocaleString();
-        cardContent.appendChild(h3);
-        cardContent.appendChild(p);
-        card.appendChild(cardContent);
-        card.addEventListener('click', () => openModal(u));
-        grid.appendChild(card);
-      });
-      // Add "View All" button
-      const viewAllBtn = document.createElement('div');
-      viewAllBtn.id = 'viewAllBtn';
-      viewAllBtn.innerHTML = '<a href="all-gallery.html" class="btn" style="display:inline-block;">Lihat Selengkapnya</a>';
-      grid.parentNode.insertBefore(viewAllBtn, grid.nextSibling);
+        displayItems.forEach(u=>{
+          // create card
+          const card = document.createElement('div'); card.className = 'card';
+          card.setAttribute('data-app', u.app);
+          const img = document.createElement('img');
+          img.src = u.imageData || 'IMAGES/placeholder.jpg';
+          img.alt = u.description || '';
+          img.loading = 'lazy';
+          img.onerror = function(){ this.src='IMAGES/placeholder.jpg'; };
+          card.appendChild(img);
+          const cardContent = document.createElement('div'); cardContent.className = 'card-content';
+          const h3 = document.createElement('h3');
+          h3.textContent = u.app ? u.app.toUpperCase() + ' — ' + (u.description || '') : (u.description || '');
+          const p = document.createElement('p');
+          p.textContent = 'Uploaded: ' + new Date(u.timestamp?.toDate ? u.timestamp.toDate() : u.timestamp || Date.now()).toLocaleString();
+          cardContent.appendChild(h3);
+          cardContent.appendChild(p);
+          card.appendChild(cardContent);
+          card.addEventListener('click', () => openModal(u));
+          grid.appendChild(card);
+        });
+        // Add "View All" button
+        const viewAllBtn = document.createElement('div');
+        viewAllBtn.id = 'viewAllBtn';
+        viewAllBtn.innerHTML = '<a href="all-gallery.html" class="btn" style="display:inline-block;">Lihat Selengkapnya</a>';
+        grid.parentNode.insertBefore(viewAllBtn, grid.nextSibling);
 
-      // --- Populate Gallery Art section (Top 10 Digital/Traditional Art) ---
-      const artGrid = document.querySelector('#GalleryArt .art-grid');
-      if (artGrid) {
-        artGrid.innerHTML = ''; // Clear static content
-        const digitalArtUploads = uploads.filter(u => u.app === 'digitalart' || u.app === 'traditionalart');
-        digitalArtUploads.sort((a,b)=> (b.totalPercent || 0) - (a.totalPercent || 0));
-        const top10Art = digitalArtUploads.slice(0, 10);
+        // --- Populate Gallery Art section (Top 10 Digital/Traditional Art) ---
+        const artGrid = document.querySelector('#GalleryArt .art-grid');
+        if (artGrid) {
+          artGrid.innerHTML = ''; // Clear static content
+          const digitalArtUploads = uploads.filter(u => u.app === 'digitalart' || u.app === 'traditionalart');
+          digitalArtUploads.sort((a,b)=> (b.totalPercent || 0) - (a.totalPercent || 0));
+          const top10Art = digitalArtUploads.slice(0, 10);
 
-        if (top10Art.length === 0) {
-          artGrid.innerHTML = '<p style="text-align:center; padding: 2rem; color: var(--muted);">Belum ada karya Digital/Traditional Art yang diunggah.</p>';
-        } else {
-          top10Art.forEach(u => {
-              const artItem = document.createElement('div');
-              artItem.className = 'art-item';
+          if (top10Art.length === 0) {
+            artGrid.innerHTML = '<p style="text-align:center; padding: 2rem; color: var(--muted);">Belum ada karya Digital/Traditional Art yang diunggah.</p>';
+          } else {
+            top10Art.forEach(u => {
+                const artItem = document.createElement('div');
+                artItem.className = 'art-item';
+                const img = document.createElement('img');
+                img.src = u.imageData || 'IMAGES/placeholder.jpg';
+                img.alt = u.description || '';
+                img.loading = 'lazy';
+                img.onerror = function(){ this.src='IMAGES/placeholder.jpg'; };
+                artItem.appendChild(img);
+                artItem.addEventListener('click', () => openLightbox(img.src, img.alt));
+                artGrid.appendChild(artItem);
+            });
+        }
+
+        // --- Photo Gallery section (Top 10 Photography) ---
+        const photoGrid = document.querySelector('.photo-gallery .photo-grid');
+        if (photoGrid) {
+          photoGrid.innerHTML = ''; // Clear static content
+          const photographyUploads = uploads.filter(u => u.app === 'fotogrfi');
+          photographyUploads.sort((a,b)=> (b.totalPercent || 0) - (a.totalPercent || 0));
+          const top10Photos = photographyUploads.slice(0, 10);
+
+          if (top10Photos.length === 0) {
+            photoGrid.innerHTML = '<p style="text-align:center; padding: 2rem; color: var(--muted);">Belum ada karya Fotografi yang diunggah.</p>';
+          } else {
+            top10Photos.forEach(u => {
+              const photoItem = document.createElement('div');
+              photoItem.className = 'photo-item';
               const img = document.createElement('img');
               img.src = u.imageData || 'IMAGES/placeholder.jpg';
               img.alt = u.description || '';
               img.loading = 'lazy';
               img.onerror = function(){ this.src='IMAGES/placeholder.jpg'; };
-              artItem.appendChild(img);
-              artItem.addEventListener('click', () => openLightbox(img.src, img.alt));
-              artGrid.appendChild(artItem);
-          });
-      }
-
-      // --- Photo Gallery section (Top 10 Photography) ---
-      const photoGrid = document.querySelector('.photo-gallery .photo-grid');
-      if (photoGrid) {
-        photoGrid.innerHTML = ''; // Clear static content
-        const photographyUploads = uploads.filter(u => u.app === 'fotogrfi');
-        photographyUploads.sort((a,b)=> (b.totalPercent || 0) - (a.totalPercent || 0));
-        const top10Photos = photographyUploads.slice(0, 10);
-
-        if (top10Photos.length === 0) {
-          photoGrid.innerHTML = '<p style="text-align:center; padding: 2rem; color: var(--muted);">Belum ada karya Fotografi yang diunggah.</p>';
-        } else {
-          top10Photos.forEach(u => {
-            const photoItem = document.createElement('div');
-            photoItem.className = 'photo-item';
-            const img = document.createElement('img');
-            img.src = u.imageData || 'IMAGES/placeholder.jpg';
-            img.alt = u.description || '';
-            img.loading = 'lazy';
-            img.onerror = function(){ this.src='IMAGES/placeholder.jpg'; };
-            photoItem.appendChild(img);
-            // for consistency with previous static items
-            const overlay = document.createElement('div');
-            overlay.className = 'photo-overlay';
-            const h4 = document.createElement('h4');
-            h4.textContent = u.description ? u.description.split(' ')[0] : '';
-            const p = document.createElement('p');
-            p.textContent = (u.description || '').slice(0, 50) + ((u.description && u.description.length > 50) ? '...' : '');
-            overlay.appendChild(h4);
-            overlay.appendChild(p);
-            photoItem.appendChild(overlay);
-            photoItem.addEventListener('click', () => openLightbox(img.src, img.alt));
-            photoGrid.appendChild(photoItem);
-          });
-        }
-      }
-
-      // Helper function to animate number counting up
-      function animateValue(obj, start, end, duration) {
-        let startTimestamp = null;
-        const step = (timestamp) => {
-          if (!startTimestamp) startTimestamp = timestamp;
-          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-          const currentValue = Math.floor(progress * (end - start) + start);
-          obj.innerHTML = currentValue + '%';
-          if (progress < 1) {
-            window.requestAnimationFrame(step);
+              photoItem.appendChild(img);
+              // for consistency with previous static items
+              const overlay = document.createElement('div');
+              overlay.className = 'photo-overlay';
+              const h4 = document.createElement('h4');
+              h4.textContent = u.description ? u.description.split(' ')[0] : '';
+              const p = document.createElement('p');
+              p.textContent = (u.description || '').slice(0, 50) + ((u.description && u.description.length > 50) ? '...' : '');
+              overlay.appendChild(h4);
+              overlay.appendChild(p);
+              photoItem.appendChild(overlay);
+              photoItem.addEventListener('click', () => openLightbox(img.src, img.alt));
+              photoGrid.appendChild(photoItem);
+            });
           }
-        };
-        window.requestAnimationFrame(step);
+        }
+
+        // Helper function to animate number counting up
+        function animateValue(obj, start, end, duration) {
+          let startTimestamp = null;
+          const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const currentValue = Math.floor(progress * (end - start) + start);
+            obj.innerHTML = currentValue + '%';
+            if (progress < 1) {
+              window.requestAnimationFrame(step);
+            }
+          };
+          window.requestAnimationFrame(step);
+        }
+
+        // update skill bars from summary
+        APPS.forEach(app=>{
+          const bar = document.getElementById(app + '-bar');
+          const pct = document.getElementById(app + '-percent');
+          const avg = summary[app] ? summary[app].average : 0;
+          const oldAvg = parseInt(pct.textContent) || 0;
+
+          if(bar) bar.style.width = avg + '%'; // CSS transition will handle this
+          // Selalu animasikan angka dari 0 ke rata-rata saat ini saat dimuat
+          if(pct) animateValue(pct, 0, avg, 900);
+        });
+      } catch (error) {
+        console.error("Error loading uploads:", error);
+        const grid = document.getElementById('portfolioGrid');
+        grid.innerHTML = '<p style="text-align:center; padding: 2rem; color: var(--muted);">Gagal memuat galeri. Coba refresh halaman.</p>';
       }
-
-      // update skill bars from summary
-      APPS.forEach(app=>{
-        const bar = document.getElementById(app + '-bar');
-        const pct = document.getElementById(app + '-percent');
-        const avg = summary[app] ? summary[app].average : 0;
-        const oldAvg = parseInt(pct.textContent) || 0;
-
-        if(bar) bar.style.width = avg + '%'; // CSS transition will handle this
-        // Selalu animasikan angka dari 0 ke rata-rata saat ini saat dimuat
-        if(pct) animateValue(pct, 0, avg, 900);
-      });
     }
 
     /* ---------- Search and Filter ---------- */
@@ -926,7 +941,7 @@
     document.getElementById('toTop').addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
 
     // Contact Form Handler
-    document.getElementById('contactForm').addEventListener('submit', (e) => {
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('contactName').value.trim();
       const email = document.getElementById('contactEmail').value.trim();
@@ -939,22 +954,34 @@
         return;
       }
 
-      // Construct WhatsApp message
-      let waMessage = `*Pesan dari Portofolio Rangga*\n\n`;
-      waMessage += `*Nama:* ${name}\n`;
-      if (email) waMessage += `*Email:* ${email}\n`;
-      waMessage += `*Jenis Pesan:* ${type}\n\n`;
-      waMessage += `*Pesan:*\n${message}`;
+      try {
+        // Save to Firebase first
+        const contactData = { name, email, type, message };
+        await saveContactToFirebase(contactData);
 
-      // Encode for URL
-      const encodedMessage = encodeURIComponent(waMessage);
-      const waUrl = `https://wa.me/6287860087460?text=${encodedMessage}`;
+        // Construct WhatsApp message
+        let waMessage = `*Pesan dari Portofolio Rangga*\n\n`;
+        waMessage += `*Nama:* ${name}\n`;
+        if (email) waMessage += `*Email:* ${email}\n`;
+        waMessage += `*Jenis Pesan:* ${type}\n\n`;
+        waMessage += `*Pesan:*\n${message}`;
 
-      // Open WhatsApp
-      window.open(waUrl, '_blank');
+        // Encode for URL
+        const encodedMessage = encodeURIComponent(waMessage);
+        const waUrl = `https://wa.me/6287860087460?text=${encodedMessage}`;
 
-      // Reset form
-      document.getElementById('contactForm').reset();
+        // Open WhatsApp
+        window.open(waUrl, '_blank');
+
+        // Show success message
+        alert('Pesan berhasil dikirim! Terima kasih atas pesan Anda.');
+
+        // Reset form
+        document.getElementById('contactForm').reset();
+      } catch (error) {
+        console.error('Error saving contact:', error);
+        alert('Gagal mengirim pesan. Silakan coba lagi.');
+      }
     });
 
     // initial set progress-bar width from data-value for static values

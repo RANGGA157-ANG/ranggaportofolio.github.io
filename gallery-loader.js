@@ -2,6 +2,10 @@
 /*      GALLERY & SLIDER LOADER       */
 /* ================================== */
 
+// Import Firebase functions
+import { getUploads, deleteUploadFromFirebase } from "./firebase-uploads.js";
+import { animateValue } from "./ui-animation.js";
+
 function initGallery(appKey) {
     const slidesEl = document.getElementById('slides');
     const thumbsContainer = document.getElementById('thumbs');
@@ -20,25 +24,30 @@ function initGallery(appKey) {
     let currentIndex = 0;
 
     // Fungsi untuk menghitung skill summary
-    function calculateAndDisplaySummary() {
-        const allUploads = getUploads();
-        const appUploads = allUploads.filter(u => u.app === appKey);
-        let average = 0;
-        if (appUploads.length > 0) {
-            const totalPercent = appUploads.reduce((sum, u) => sum + (u.totalPercent || 0), 0);
-            average = Math.round(totalPercent / appUploads.length);
-        }
+    async function calculateAndDisplaySummary() {
+        try {
+            const allUploads = await getUploads();
+            const appUploads = allUploads.filter(u => u.app === appKey);
+            let average = 0;
+            if (appUploads.length > 0) {
+                const totalPercent = appUploads.reduce((sum, u) => sum + (u.totalPercent || 0), 0);
+                average = Math.round(totalPercent / appUploads.length);
+            }
 
-        if (skillPercentEl && progressBarEl) {
-            progressBarEl.style.width = average + '%';
-            animateValue(skillPercentEl, 0, average, 900);
+            if (skillPercentEl && progressBarEl) {
+                progressBarEl.style.width = average + '%';
+                animateValue(skillPercentEl, 0, average, 900);
+            }
+        } catch (error) {
+            console.error("Error calculating summary:", error);
         }
     }
 
     // Fungsi untuk merender galeri
-    function renderGallery() {
-        const allUploads = getUploads();
-        const myUploads = allUploads.filter(u => u.app === appKey);
+    async function renderGallery() {
+        try {
+            const allUploads = await getUploads();
+            const myUploads = allUploads.filter(u => u.app === appKey);
         
         // Menggabungkan item statis (jika ada) dengan item dinamis
         const staticSlides = Array.from(slidesEl.querySelectorAll('img, video'));
@@ -90,19 +99,25 @@ function initGallery(appKey) {
                 deleteBtn.innerHTML = '&times;';
                 deleteBtn.title = 'Hapus karya ini';
                 deleteBtn.style.cssText = 'position:absolute; top:-5px; right:-5px; background:#f44336; color:white; border:none; border-radius:50%; width:20px; height:20px; cursor:pointer; z-index:10;';
-                deleteBtn.onclick = (e) => {
+                deleteBtn.onclick = async (e) => {
                     e.stopPropagation();
                     if (confirm('Anda yakin ingin menghapus karya ini?')) {
-                        const currentUploads = getUploads();
-                        const newUploads = currentUploads.filter(up => up.id !== item.id);
-                        saveUploads(newUploads); // Simpan data baru
-                        // Tidak perlu hitung ulang summary di sini, biarkan halaman utama yang melakukannya
-                        renderAll(); // Render ulang semuanya
+                        try {
+                            await deleteUploadFromFirebase(item.id);
+                            await renderAll(); // Render ulang semuanya
+                        } catch (error) {
+                            console.error("Error deleting upload:", error);
+                            alert('Gagal menghapus karya. Coba lagi.');
+                        }
                     }
                 };
                 thumbEl.appendChild(deleteBtn);
             }
         });
+        } catch (error) {
+            console.error("Error rendering gallery:", error);
+            slidesEl.innerHTML = '<p style="text-align:center; padding: 2rem; color: var(--muted);">Gagal memuat galeri. Coba refresh halaman.</p>';
+        }
     }
 
     function updateSlider() {
@@ -123,13 +138,13 @@ function initGallery(appKey) {
         }
     }
 
-    function renderAll() {
-        renderGallery();
+    async function renderAll() {
+        await renderGallery();
         if (currentIndex >= galleryItems.length) {
             currentIndex = Math.max(0, galleryItems.length - 1);
         }
         updateSlider();
-        calculateAndDisplaySummary();
+        await calculateAndDisplaySummary();
     }
 
     // Event Listeners

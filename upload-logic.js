@@ -83,11 +83,17 @@ const APP_LABELS = {
 
 // UI refs
 const loginBtn = document.getElementById('loginBtn');
+const registerBtn = document.getElementById('registerBtn');
 const loginSection = document.getElementById('loginSection');
 const uploadContent = document.getElementById('uploadContent');
 const loginError = document.getElementById('loginError');
-const usernameEl = document.getElementById('username');
+const emailEl = document.getElementById('email');
 const passwordEl = document.getElementById('password');
+
+// Import Firebase functions
+import { getUploads, saveUploadToFirebase, deleteUploadFromFirebase } from "./firebase-uploads.js";
+import { authenticateAnonymously, authenticateWithEmailPassword, registerWithEmailPassword, checkFirebaseConnection } from "./firebase-config.js";
+import { showError, showSuccess } from "./ui-animation.js";
 const fileInput = document.getElementById('fileInput');
 const previewWrap = document.getElementById('previewWrap');
 const previewImg = document.getElementById('previewImg');
@@ -368,110 +374,74 @@ updateLabels(appSelect.value);
 
 // compute final and store
 finalizeBtn.addEventListener('click', async ()=>{
-  if(!currentImageData){
-    showStatus('Silakan upload gambar terlebih dulu.');
-    return;
-  }
-  if (descEl.value.trim().length < 10) {
-    showStatus('Deskripsi proyek terlalu pendek. Mohon jelaskan lebih detail.');
-    return;
-  }
-  // ensure AI run
-  if(!lastAiScores){
-    showStatus('Klik "Analisis AI" dulu sebelum finalize.');
-    return;
-  }
-  // collect user scores
-  const userScores = {
-    modeling: Number(document.getElementById('u_modeling').value) || 0,
-    lighting: Number(document.getElementById('u_lighting').value) || 0,
-    texturing: Number(document.getElementById('u_texturing').value) || 0,
-    rendering: Number(document.getElementById('u_rendering').value) || 0,
-    deskripsi: Number(document.getElementById('u_deskripsi').value) || 0
-  };
+  try {
+    // Validate required fields
+    const title = document.getElementById('uploadTitle').value.trim();
+    const description = document.getElementById('uploadDescription').value.trim();
+    const app = document.getElementById('uploadApp').value;
+    const imageFile = document.getElementById('uploadImageFile').files[0];
 
-  // Validate userScores: ensure all are numbers between 0-10
-  for (const key in userScores) {
-    if (isNaN(userScores[key]) || userScores[key] < 0 || userScores[key] > 10) {
-      showStatus(`Error: Nilai ${key} tidak valid (harus 0-10).`);
+    if (!title || !description || !app) {
+      showError('Judul, deskripsi, dan aplikasi harus diisi!');
       return;
     }
-  }
 
-  // Validate lastAiScores: ensure exists and all are numbers
-  if (!lastAiScores) {
-    showStatus('Error: Jalankan Analisis AI dulu sebelum finalize.');
-    return;
-  }
-  for (const key in lastAiScores) {
-    if (key === 'textSummary') continue; // Skip non-numeric fields
-    if (isNaN(lastAiScores[key]) || lastAiScores[key] < 0 || lastAiScores[key] > 10) {
-      console.error(`AI score for ${key} is invalid: ${lastAiScores[key]}`);
-      showStatus('Error: Analisis AI gagal, coba lagi.');
+    if (!imageFile) {
+      showError('File gambar/video harus dipilih!');
       return;
     }
-  }
 
-  // final per-aspect = (user*0.5 + ai*0.5)
-  const finalScores = {};
-  for(const k in userScores){
-    finalScores[k] = Number(((userScores[k]*0.5) + (lastAiScores[k]*0.5)).toFixed(2));
-  }
-
-  // compute total skill percent using weights (0-10 -> percent)
-  let total = 0;
-  for(const k in finalScores){
-    const weight = ASPECT_WEIGHTS[k] || 0;
-    total += (finalScores[k] * (weight/100)) * 10; // because finalScores in 0-10 -> *10 to get percent
-  }
-  // Bug Fix: Ensure totalPercent is a valid number before saving
-  let totalPercent = Number(total.toFixed(2)); // 0-100
-  if (isNaN(totalPercent)) {
-    console.error("Calculation error: totalPercent is NaN. Defaulting to 0.", { userScores, lastAiScores, finalScores });
-    totalPercent = 0;
-  }
-
-  // build upload object
-  const obj = {
-    id: 'upl_'+Date.now(),
-    app: appSelect.value, // e.g., 'blender'
-    imageData: currentImageData,
-    description: descEl.value,
-    userScores,
-    aiScores: lastAiScores,
-    finalScores,
-    totalPercent,
-    aiText: lastAiText,
-    timestamp: new Date().toISOString()
-  };
-
-  // store in uploads (check for edit mode)
-  const uploads = getUploads();
-  if (editModeId) {
-    const index = uploads.findIndex(u => u.id === editModeId);
-    if (index !== -1) {
-      // Preserve original ID and timestamp when editing
-      uploads[index] = { ...obj, id: editModeId, timestamp: uploads[index].timestamp };
-    } else {
-      uploads.unshift(obj); // Fallback: add as new if ID not found
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'];
+    if (!allowedTypes.includes(imageFile.type)) {
+      showError('Format file tidak didukung. Gunakan JPG, PNG, GIF, WebP, MP4, atau WebM.');
+      return;
     }
-  } else {
-    uploads.unshift(obj); // add newest front
+
+    // Validate file size (max 10MB)
+    if (imageFile.size > 10 * 1024 * 1024) {
+      showError('Ukuran file maksimal 10MB.');
+      return;
+    }
+
+    // Prepare upload data
+    const uploadData = {
+      title,
+      description,
+      app,
+      imageData: '', // Will be set after upload
+      totalPercent: parseInt(document.getElementById('uploadPercent').value) || 0,
+      skillPercent: parseInt(document.getElementById('uploadSkillPercent').value) || 0,
+      timeSpent: document.getElementById('uploadTimeSpent').value.trim() || '',
+      challenges: document.getElementById('uploadChallenges').value.trim() || '',
+      learnings: document.getElementById('uploadLearnings').value.trim() || ''
+    };
+
+    // Show loading
+    finalizeBtn.disabled = true;
+    finalizeBtn.textContent = 'Mengupload...';
+
+    // Save to Firebase (with file upload)
+    const docId = await saveUploadToFirebase(uploadData, imageFile);
+
+    // Success
+    showSuccess('Upload berhasil!');
+
+    // Reset form and close modal
+    document.getElementById('uploadForm').reset();
+    uploadModal.classList.remove('open');
+    uploadModal.setAttribute('aria-hidden', 'true');
+
+    // Reload data to refresh UI
+    loadUploads();
+
+  } catch (error) {
+    console.error('Upload error:', error);
+    showError(error.message);
+  } finally {
+    finalizeBtn.disabled = false;
+    finalizeBtn.textContent = 'Finalisasi Upload';
   }
-  saveUploads(uploads);
-
-  // Hapus perhitungan summary dari sini. Biarkan index.html yang menghitung.
-  status.innerHTML = `<span class="success">${editModeId ? 'Berhasil diperbarui!' : 'Berhasil di-upload!'} Persentase skill akan diperbarui di halaman utama.</span>`;
-
-  // reset-ish
-  lastAiScores = null;
-  lastAiText = '';
-  // redirect to index.html Portofoliodigital section
-  setTimeout(()=>{
-    const target = `index.html#Portofoliodigital`;
-    console.log('Redirecting to:', target); // Debug log
-    window.location.href = target;
-  },800);
 });
 
 // Bug Fix: Reset AI analysis if description or file changes
@@ -496,20 +466,118 @@ fileInput.addEventListener('change', resetAiAnalysisState);
 appSelect.addEventListener('change', resetAiAnalysisState);
 
 // login functionality
-loginBtn.addEventListener('click', ()=>{
-  const username = usernameEl.value.trim();
+loginBtn.addEventListener('click', async ()=>{
+  const email = emailEl.value.trim();
   const password = passwordEl.value.trim();
-  // Pengecekan kredensial langsung (seperti semula)
-  if(username === "MELABAR157" && password === "06-10-08"){
+
+  if (!email) {
+    loginError.textContent = 'Email harus diisi';
+    loginError.style.display = 'block';
+    loginError.classList.add('message');
+    return;
+  }
+
+  if (!password) {
+    loginError.textContent = 'Password harus diisi';
+    loginError.style.display = 'block';
+    loginError.classList.add('message');
+    return;
+  }
+
+  // Tambahkan indikator loading dan timeout
+  loginBtn.disabled = true;
+  registerBtn.disabled = true;
+  loginError.textContent = 'Mencoba login...';
+  loginError.style.display = 'block';
+
+  const loginTimeout = setTimeout(() => {
+    loginError.textContent = 'Login timeout. Periksa koneksi internet atau coba lagi nanti.';
+    loginBtn.disabled = false;
+    registerBtn.disabled = false;
+  }, 10000); // Timeout setelah 10 detik
+
+  // Langkah 1: Periksa koneksi ke Firebase terlebih dahulu
+  const isConnected = await checkFirebaseConnection();
+  if (!isConnected) {
+    loginError.textContent = 'Koneksi ke server gagal. Periksa konfigurasi Firebase dan jaringan Anda.';
+    clearTimeout(loginTimeout); // Hentikan timeout karena kita sudah tahu masalahnya
+    loginBtn.disabled = false;
+    registerBtn.disabled = false;
+    return;
+  }
+
+  try {
+    console.log('Attempting Firebase email/password authentication...');
+    // Authenticate with email and password
+    await authenticateWithEmailPassword(email, password);
+    console.log('Authentication successful, showing upload content...');
     loginSection.style.opacity = '0';
     setTimeout(() => {
-      loginSection.style.display = 'none';
-      uploadContent.style.display = 'block';
+      loginSection.classList.add('hidden');
+      uploadContent.classList.remove('hidden');
       uploadContent.classList.add('show');
     }, 500);
     loginError.style.display = 'none';
-  } else {
-    loginError.textContent = 'sandi anda salah';
+  } catch (error) {
+    console.error('Auth error:', error);
+    // Menampilkan pesan error yang lebih mudah dimengerti
+    loginError.textContent = 'Login gagal. Periksa kembali email dan password Anda.';
+    loginError.style.display = 'block';
+    loginError.classList.add('message');
+  } finally {
+    // Hapus timeout dan aktifkan kembali tombol setelah proses selesai
+    clearTimeout(loginTimeout);
+    loginBtn.disabled = false;
+    registerBtn.disabled = false;
+  }
+});
+
+// register functionality
+registerBtn.addEventListener('click', async ()=>{
+  const email = emailEl.value.trim();
+  const password = passwordEl.value.trim();
+
+  if (!email || !password) {
+    loginError.textContent = 'Email dan password harus diisi';
+    loginError.style.display = 'block';
+    loginError.classList.add('message');
+    return;
+  }
+
+  if (password.length < 6) {
+    loginError.textContent = 'Password minimal 6 karakter';
+    loginError.style.display = 'block';
+    loginError.classList.add('message');
+    return;
+  }
+
+  // Hardcoded registration for demo
+  if (email === 'konohaboruto37@gmail.com' && password === '06-10-08') {
+    alert('Pendaftaran berhasil! Sekarang silakan login dengan email dan password yang sama.');
+    loginError.style.display = 'none';
+    return;
+  }
+
+  try {
+    console.log('Attempting Firebase email/password registration...');
+    // Register with email and password
+    await registerWithEmailPassword(email, password);
+    console.log('Registration successful, showing upload content...');
+    loginSection.style.opacity = '0';
+    setTimeout(() => {
+      loginSection.classList.add('hidden');
+      uploadContent.classList.remove('hidden');
+      uploadContent.classList.add('show');
+    }, 500);
+    loginError.style.display = 'none';
+  } catch (error) {
+    console.error('Registration error:', error);
+    // Menampilkan pesan error yang lebih mudah dimengerti
+    if (error.code === 'auth/email-already-in-use') {
+        loginError.textContent = 'Email ini sudah terdaftar. Silakan login.';
+    } else {
+        loginError.textContent = 'Pendaftaran gagal. Coba lagi nanti.';
+    }
     loginError.style.display = 'block';
     loginError.classList.add('message');
   }

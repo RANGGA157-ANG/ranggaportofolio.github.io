@@ -2,31 +2,23 @@
 /*          GLOBAL HELPERS          */
 /* ================================== */
 
-// Fungsi untuk mengambil data dari localStorage
-function getUploads() {
-    try {
-        return JSON.parse(localStorage.getItem('portfolio_uploads') || '[]');
-    } catch (e) {
-        console.error("Error parsing portfolio_uploads from localStorage", e);
-        return [];
-    }
-}
+// Re-export functions from modular files for backward compatibility
+export { getUploads, saveUploadToFirebase, deleteUploadFromFirebase } from "./firebase-uploads.js";
+export { incrementVisitorCount, getVisitorCount } from "./firebase-stats.js";
+export { animateValue, showError, showSuccess } from "./ui-animation.js";
+export { checkFirebaseConnection } from "./firebase-config.js";
 
-// Fungsi untuk menyimpan data ke localStorage
-function saveUploads(arr) {
-    localStorage.setItem('portfolio_uploads', JSON.stringify(arr));
-    // Kirim event agar tab lain bisa ikut update
-    window.dispatchEvent(new Event('storage'));
-}
+// Legacy functions for backward compatibility (redirect to new modules)
+import { getUploads as newGetUploads, saveUploadToFirebase as newSaveUpload, deleteUploadFromFirebase as newDeleteUpload } from "./firebase-uploads.js";
+import { incrementVisitorCount as newIncrementVisitor, getVisitorCount as newGetVisitor } from "./firebase-stats.js";
+import { animateValue as newAnimateValue, showError as newShowError, showSuccess as newShowSuccess } from "./ui-animation.js";
 
-// Fungsi untuk menganimasikan angka (misal: persentase skill)
-function animateValue(obj, start, end, duration) {
-    let startTimestamp = null;
-    const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        obj.innerHTML = Math.floor(progress * (end - start) + start) + '%';
-        if (progress < 1) window.requestAnimationFrame(step);
-    };
-    window.requestAnimationFrame(step);
-}
+// Backward compatibility functions
+window.getUploads = newGetUploads;
+window.saveUploadToFirebase = newSaveUpload;
+window.deleteUploadFromFirebase = newDeleteUpload;
+window.incrementVisitorCount = newIncrementVisitor;
+window.getVisitorCount = newGetVisitor;
+window.animateValue = newAnimateValue;
+window.showError = newShowError;
+window.showSuccess = newShowSuccess;

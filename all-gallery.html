@@ -216,7 +216,9 @@
     <img id="lightboxImg" src="" alt="lightbox">
   </div>
 
-  <script>
+  <script type="module">
+    // Import Firebase functions
+    import { getUploads, deleteUploadFromFirebase } from "./firebase-uploads.js";
     /* ---------- Configuration ---------- */
     const APPS = ['blender','zbrush','substance','photoshop','premiere','fotogrfi','digitalart','traditionalart'];
 
@@ -225,57 +227,63 @@
     function saveJSON(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
 
     /* ---------- Load all uploads and update UI ---------- */
-    function loadUploads(){
-      const uploads = getJSON('portfolio_uploads', []);
-      const perApps = {};
-      APPS.forEach(a=> perApps[a] = getJSON(a + '_projects', []));
-      // build combined list (uploads first)
-      const combined = (uploads || []).slice();
-      // include legacy per-app items not already in uploads
-      APPS.forEach(app=>{
-        perApps[app].forEach(p=>{
-          if(!combined.find(u=>u.id && u.id === p.id)){
-            combined.push({
-              id: p.id || ('legacy_'+Date.now()),
-              app: app,
-              imageData: p.image || p.imageData || '',
-              description: p.desc || p.description || '',
-              userScores: p.userScores || {},
-              aiScores: p.aiScores || {},
-              finalScores: p.finalScores || {},
-              totalPercent: p.totalPercent || 0,
-              aiText: p.aiText || '',
-              timestamp: p.timestamp || new Date().toISOString()
-            });
-          }
+    async function loadUploads(){
+      try {
+        const uploads = await getUploads();
+        const perApps = {};
+        APPS.forEach(a=> perApps[a] = getJSON(a + '_projects', []));
+        // build combined list (uploads first)
+        const combined = (uploads || []).slice();
+        // include legacy per-app items not already in uploads
+        APPS.forEach(app=>{
+          perApps[app].forEach(p=>{
+            if(!combined.find(u=>u.id && u.id === p.id)){
+              combined.push({
+                id: p.id || ('legacy_'+Date.now()),
+                app: app,
+                imageData: p.image || p.imageData || '',
+                description: p.desc || p.description || '',
+                userScores: p.userScores || {},
+                aiScores: p.aiScores || {},
+                finalScores: p.finalScores || {},
+                totalPercent: p.totalPercent || 0,
+                aiText: p.aiText || '',
+                timestamp: p.timestamp || new Date().toISOString()
+              });
+            }
+          });
         });
-      });
 
-      // sort by totalPercent desc (highest skill first)
-      combined.sort((a,b)=> (b.totalPercent || 0) - (a.totalPercent || 0));
+        // sort by totalPercent desc (highest skill first)
+        combined.sort((a,b)=> (b.totalPercent || 0) - (a.totalPercent || 0));
 
-      const grid = document.getElementById('portfolioGrid');
-      // clear grid
-      grid.innerHTML = '';
+        const grid = document.getElementById('portfolioGrid');
+        // clear grid
+        grid.innerHTML = '';
 
-      combined.forEach(u=>{
-        // create card
-        const card = document.createElement('div'); card.className = 'card';
-        const img = document.createElement('img'); img.src = u.imageData || 'IMAGES/placeholder.jpg'; img.alt = u.description || '';
-        const h = document.createElement('h3'); h.textContent = (u.app? u.app.toUpperCase() + ' — Karya' : 'Karya');
-        const p = document.createElement('p'); p.textContent = (u.description || '').slice(0,140) + ((u.description && u.description.length>140)?'...':'');
-        card.appendChild(img); card.appendChild(h); card.appendChild(p);
-        card.addEventListener('click', ()=> openModal(u));
-        grid.appendChild(card);
-      });
-
-      // attach lightbox to portfolio images
-      document.querySelectorAll('#portfolioGrid .card img').forEach(img => {
-        img.addEventListener('click', (e) => {
-          e.stopPropagation(); // prevent modal
-          openLightbox(img.src, img.alt);
+        combined.forEach(u=>{
+          // create card
+          const card = document.createElement('div'); card.className = 'card';
+          const img = document.createElement('img'); img.src = u.imageData || 'IMAGES/placeholder.jpg'; img.alt = u.description || '';
+          const h = document.createElement('h3'); h.textContent = (u.app? u.app.toUpperCase() + ' — Karya' : 'Karya');
+          const p = document.createElement('p'); p.textContent = (u.description || '').slice(0,140) + ((u.description && u.description.length>140)?'...':'');
+          card.appendChild(img); card.appendChild(h); card.appendChild(p);
+          card.addEventListener('click', ()=> openModal(u));
+          grid.appendChild(card);
         });
-      });
+
+        // attach lightbox to portfolio images
+        document.querySelectorAll('#portfolioGrid .card img').forEach(img => {
+          img.addEventListener('click', (e) => {
+            e.stopPropagation(); // prevent modal
+            openLightbox(img.src, img.alt);
+          });
+        });
+      } catch (error) {
+        console.error("Error loading uploads:", error);
+        const grid = document.getElementById('portfolioGrid');
+        grid.innerHTML = '<p style="text-align:center; padding: 2rem; color: var(--muted);">Gagal memuat galeri. Coba refresh halaman.</p>';
+      }
     }
 
     /* ---------- Search and Filter ---------- */
@@ -336,25 +344,29 @@
       document.getElementById('deleteError').style.display = 'none';
       document.getElementById('deleteSuccess').style.display = 'none';
 
-      document.getElementById('deleteConfirm').onclick = () => {
+      document.getElementById('deleteConfirm').onclick = async () => {
         const code = document.getElementById('deleteCode').value;
         // Obfuscated delete code check. This is NOT true security.
         // "061008" -> btoa("061008") -> "MDYxMDA4"
         if(code === atob("MDYxMDA4")){
-          const uploads = getJSON('portfolio_uploads', []);
-          const filtered = uploads.filter(u => (u.id || u.timestamp) !== id);
-          saveJSON('portfolio_uploads', filtered);
-          document.getElementById('deleteSuccess').style.display = 'block';
-          setTimeout(() => {
-            // Close all modals
-            deleteModal.classList.remove('open');
-            deleteModal.setAttribute('aria-hidden','true');
-            modal.classList.remove('open');
-            modal.setAttribute('aria-hidden','true');
-            // Reload data to refresh UI
-            loadUploads();
-            document.getElementById('deleteSuccess').style.display = 'none';
-          }, 2000);
+          try {
+            await deleteUploadFromFirebase(id);
+            document.getElementById('deleteSuccess').style.display = 'block';
+            setTimeout(() => {
+              // Close all modals
+              deleteModal.classList.remove('open');
+              deleteModal.setAttribute('aria-hidden','true');
+              modal.classList.remove('open');
+              modal.setAttribute('aria-hidden','true');
+              // Reload data to refresh UI
+              loadUploads();
+              document.getElementById('deleteSuccess').style.display = 'none';
+            }, 2000);
+          } catch (error) {
+            console.error("Error deleting upload:", error);
+            document.getElementById('deleteError').textContent = 'Gagal menghapus karya. Coba lagi.';
+            document.getElementById('deleteError').style.display = 'block';
+          }
         } else {
           document.getElementById('deleteError').style.display = 'block';
           document.getElementById('deleteCode').classList.add('shake');

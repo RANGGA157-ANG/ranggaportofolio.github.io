@@ -123,6 +123,7 @@
     /* Responsive tweaks */
     @media (max-width: 768px) { .row { flex-direction: column; } .col { margin-bottom: 1rem; } }
   </style>
+  <style>.hidden { display: none !important; }</style>
 </head>
 <body>
 
@@ -159,18 +160,19 @@
       <div id="loginSection" class="login-section">
         <h3>Login untuk Upload</h3>
         <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" id="username" placeholder="Masukkan username">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Masukkan email">
         </div>
         <div class="form-group">
           <label for="password">Password</label>
           <input type="password" id="password" placeholder="Masukkan password">
         </div>
         <button id="loginBtn">Login</button>
-        <div id="loginError" style="color:#f99;margin-top:10px;display:none">Username atau password salah.</div>
+        <button id="registerBtn" style="margin-left:10px;">Daftar</button>
+        <div id="loginError" class="hidden" style="color:#f99;margin-top:10px;">Username atau password salah.</div>
       </div>
 
-      <div id="uploadContent" style="display:none">
+      <div id="uploadContent" class="hidden">
       <div class="upload-section">
         <h3>1) Pilih aplikasi tujuan</h3>
         <div class="form-group">
@@ -194,22 +196,22 @@
             <input id="fileInput" type="file" accept="image/*,video/mp4" style="position:absolute;left:-9999px">
             <label for="fileInput" style="display:block;padding:12px;border-radius:8px;border:2px dashed rgba(255,255,255,0.1);background:rgba(255,255,255,0.02);color:var(--muted);text-align:center;cursor:pointer;transition:background 0.2s">Klik untuk pilih gambar/video atau drag & drop di sini</label>
           </div>
-          <div class="preview" id="previewWrap" style="display:none">
+          <div class="preview hidden" id="previewWrap">
             <img id="previewImg" class="preview-img" src="" alt="preview">
-            <video id="previewVideo" class="preview-img" controls muted style="display:none;"></video>
+            <video id="previewVideo" class="preview-img hidden" controls muted></video>
           </div>
         </div>
 
         <h3>3) Deskripsi proyek (tulis teknik yang kamu pakai)</h3>
         <div class="form-group">
-          <textarea id="desc" placeholder="Contoh: blockout -> sculpt -> retopo -> UV -> HDRI lighting, bevel modifier, subsurface scattering..."></textarea>
+          <textarea id="desc" placeholder="Contoh: blockout -> sculpt -> retopo -> UV -> HDRI lighting, bevel modifier, subsurface scattering..." rows="4"></textarea>
         </div>
       </div>
 
       <div class="analysis-section">
         <h3>4) Analisis AI</h3>
         <button id="analyzeBtn">Analisis AI</button>
-        <div id="aiResult" class="analysis ai-result" style="display:none"></div>
+        <div id="aiResult" class="analysis ai-result hidden"></div>
       </div>
 
       <div class="manual-scores">
